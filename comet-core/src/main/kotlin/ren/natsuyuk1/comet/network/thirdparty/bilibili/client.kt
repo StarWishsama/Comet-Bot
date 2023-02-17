@@ -26,7 +26,7 @@ suspend fun initYabapi() {
                 isLenient = true
                 coerceInputValues = true
                 ignoreUnknownKeys = true
-            }
+            },
         )
     }
 
@@ -52,8 +52,8 @@ suspend fun initYabapi() {
                     cookieFromHeader(CometGlobalConfig.data.biliCookie).forEach {
                         addCookie("https://.bilibili.com", it)
                     }
-                }
-            )
+                },
+            ),
         )
 
         isInitializedYabapi = true

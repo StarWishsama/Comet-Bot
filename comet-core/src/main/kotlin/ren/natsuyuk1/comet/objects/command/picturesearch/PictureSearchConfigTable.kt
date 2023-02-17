@@ -18,7 +18,7 @@ object PictureSearchConfigTable : Table("picture_search_config") {
 
     suspend fun setPlatform(
         uuid: UUID,
-        searchSource: PictureSearchSource
+        searchSource: PictureSearchSource,
     ): Unit = withContext(Dispatchers.IO) {
         if (select { id eq uuid }.empty()) {
             insert {

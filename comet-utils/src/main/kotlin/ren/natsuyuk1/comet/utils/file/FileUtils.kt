@@ -29,7 +29,9 @@ val workDir by lazy {
     File(
         if (getEnv("comet.workdir").isNullOrBlank()) {
             System.getProperty("user.dir")
-        } else getEnv("comet.workdir")
+        } else {
+            getEnv("comet.workdir")
+        },
     )
 }
 
@@ -90,7 +92,7 @@ suspend fun writeToFile(input: InputStream, target: File): Unit =
 suspend fun copyResourceDirectory(
     source: JarFile,
     path: String,
-    target: File
+    target: File,
 ) = withContext(Dispatchers.IO) {
     val newPath = "$path/"
     source.entries().toList().asSequence()

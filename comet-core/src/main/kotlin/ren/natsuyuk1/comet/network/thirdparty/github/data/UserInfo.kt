@@ -6,5 +6,5 @@ data class UserInfo(
     val login: String,
     val id: Long,
     @SerialName("avatar_url")
-    val avatarURL: String
+    val avatarURL: String,
 )

@@ -71,14 +71,14 @@ object ProjectSekaiCharts {
                 cometClient.client.downloadFile(
                     "https://sdvx.in/prsk/obj/data${sdvxID}mst.png",
                     chartMaster,
-                    validator
+                    validator,
                 )
             }
             val expResult = async {
                 cometClient.client.downloadFile(
                     "https://sdvx.in/prsk/obj/data${sdvxID}exp.png",
                     chartExpert,
-                    validator
+                    validator,
                 )
             }
 

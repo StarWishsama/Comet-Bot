@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class AccountOperationStatus(
-    val statusCode: HttpStatusCode
+    val statusCode: HttpStatusCode,
 ) {
     OK(HttpStatusCode.OK),
     ALREADY_LOGON(HttpStatusCode.BadRequest),
@@ -18,5 +18,5 @@ enum class AccountOperationStatus(
 @Serializable
 data class AccountOperationResult(
     val status: AccountOperationStatus,
-    val message: String
+    val message: String,
 )

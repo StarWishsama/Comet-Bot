@@ -15,7 +15,7 @@ import ren.natsuyuk1.comet.util.toMessageWrapper
 val START = CommandProperty(
     "start",
     description = "验证命令",
-    helpText = "用于验证私聊会话"
+    helpText = "用于验证私聊会话",
 )
 
 class StartCommand(
@@ -23,7 +23,7 @@ class StartCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    private val user: CometUser
+    private val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, START) {
     override suspend fun run() {
         if (user.platform != CometPlatform.TELEGRAM) {

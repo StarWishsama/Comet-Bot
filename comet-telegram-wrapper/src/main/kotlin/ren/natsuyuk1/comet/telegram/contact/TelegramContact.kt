@@ -24,7 +24,7 @@ internal interface TelegramContact : Contact {
             comet,
             this,
             message,
-            Clock.System.now().epochSeconds
+            Clock.System.now().epochSeconds,
         ).also { it.broadcast() }
 
         val sourceType =
@@ -38,6 +38,8 @@ internal interface TelegramContact : Contact {
             contact.id.chatIdOrNull()?.let { chatId ->
                 (comet as? TelegramComet)?.send(message, sourceType, chatId)
             }
-        } else null
+        } else {
+            null
+        }
     }
 }

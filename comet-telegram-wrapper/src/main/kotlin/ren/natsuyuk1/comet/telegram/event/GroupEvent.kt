@@ -21,7 +21,7 @@ suspend fun BehaviourContext.listenGroupEvent(comet: TelegramComet) {
             is NewChatMembers -> {
                 event.members.forEach { user ->
                     GroupJoinEvent.Normal(
-                        user.toCometGroupMember(comet, it.chat.id)
+                        user.toCometGroupMember(comet, it.chat.id),
                     ).broadcast()
                 }
             }
@@ -31,7 +31,7 @@ suspend fun BehaviourContext.listenGroupEvent(comet: TelegramComet) {
                     GroupLeaveEvent(
                         comet,
                         group,
-                        event.user.toCometUser(comet)
+                        event.user.toCometUser(comet),
                     ).broadcast()
                 }
             }

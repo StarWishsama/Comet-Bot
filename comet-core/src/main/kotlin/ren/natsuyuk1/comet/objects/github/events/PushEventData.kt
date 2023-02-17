@@ -34,7 +34,7 @@ data class PushEventData(
     @SerialName("commits")
     val commitInfo: List<CommitInfo>,
     @SerialName("head_commit")
-    val headCommitInfo: CommitInfo?
+    val headCommitInfo: CommitInfo?,
 ) : GitHubEventData {
     @Serializable
     data class RepoInfo(
@@ -52,14 +52,14 @@ data class PushEventData(
         @SerialName("html_url")
         val repoUrl: String,
         @SerialName("pushed_at")
-        val pushTime: Long
+        val pushTime: Long,
     )
 
     @Serializable
     data class PusherInfo(
         val name: String,
         // 推送者为 bot 时会为空
-        val email: String?
+        val email: String?,
     )
 
     @Serializable
@@ -68,12 +68,12 @@ data class PushEventData(
         val message: String,
         val timestamp: String,
         val url: String,
-        val committer: PusherInfo
+        val committer: PusherInfo,
     )
 
     private fun getLocalTime(time: Long): String {
         return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + hmsPattern.format(
-            Instant.ofEpochMilli(time * 1000L).atZone(ZoneId.systemDefault()).toLocalDateTime()
+            Instant.ofEpochMilli(time * 1000L).atZone(ZoneId.systemDefault()).toLocalDateTime(),
         )
     }
 
@@ -101,7 +101,7 @@ data class PushEventData(
         return buildMessageWrapper {
             appendText("⬆️ 新提交 ${repoInfo.fullName} [${ref.replace(refsPattern, "")}]\n")
             appendText(
-                "by ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n\n"
+                "by ${headCommitInfo.committer.name} | ${getLocalTime(repoInfo.pushTime)}\n\n",
             )
             appendTextln(buildCommitList())
             appendText("查看差异 > $compare")

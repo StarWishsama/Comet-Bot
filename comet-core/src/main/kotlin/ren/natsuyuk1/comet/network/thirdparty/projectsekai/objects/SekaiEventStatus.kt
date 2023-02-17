@@ -7,5 +7,5 @@ enum class SekaiEventStatus {
 
     COUNTING,
 
-    END
+    END,
 }

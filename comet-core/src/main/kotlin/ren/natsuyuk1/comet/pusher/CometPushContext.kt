@@ -10,7 +10,7 @@ import ren.natsuyuk1.comet.api.message.MessageWrapper
 abstract class CometPushContext(
     val id: String,
     val target: List<CometPushTarget>,
-    val createTime: Instant = Clock.System.now()
+    val createTime: Instant = Clock.System.now(),
 ) {
     abstract fun normalize(): MessageWrapper
 
@@ -21,5 +21,5 @@ abstract class CometPushContext(
 class MinCometPushContext(
     val id: String,
     val target: List<CometPushTarget>,
-    val createTime: Instant = Clock.System.now()
+    val createTime: Instant = Clock.System.now(),
 )

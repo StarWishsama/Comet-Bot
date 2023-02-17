@@ -101,7 +101,7 @@ object ArcaeaService {
                 buildMessageWrapper {
                     if (sender is GroupMember) appendElement(sender.at())
                     appendElement(b38Image.asImage())
-                }
+                },
             )
 
             return@launch
@@ -125,7 +125,7 @@ object ArcaeaService {
             subject.sendMessage(
                 buildMessageWrapper {
                     appendText("❌ 查询用户 ${data.userID} 的信息失败")
-                }
+                },
             )
             return@launch
         }
@@ -141,7 +141,7 @@ object ArcaeaService {
             buildMessageWrapper {
                 if (sender is GroupMember) appendElement(sender.at())
                 appendElement(b38Image.asImage())
-            }
+            },
         )
     }
 }

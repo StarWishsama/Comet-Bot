@@ -55,12 +55,12 @@ open class CommandProperty(
     /**
      * 执行命令时的额外权限检查
      */
-    val extraPermissionChecker: suspend (CometUser, PlatformCommandSender) -> Boolean = { _, _ -> true }
+    val extraPermissionChecker: suspend (CometUser, PlatformCommandSender) -> Boolean = { _, _ -> true },
 )
 
 data class SubCommandProperty(
     override val name: String,
     override val alias: List<String> = listOf(),
     val parentCommandProperty: CommandProperty,
-    override val permissionLevel: UserLevel = parentCommandProperty.permissionLevel
+    override val permissionLevel: UserLevel = parentCommandProperty.permissionLevel,
 ) : CommandProperty(name, alias, "", "", "${parentCommandProperty.permission}.$name", permissionLevel)

@@ -14,7 +14,7 @@ data class CometPushTarget(
 
 enum class CometPushTargetType {
     USER,
-    GROUP
+    GROUP,
 }
 
 fun Group.toCometPushTarget(): CometPushTarget = CometPushTarget(id, CometPushTargetType.GROUP, platform)

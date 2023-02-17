@@ -32,7 +32,7 @@ private val logger = KotlinLogging.logger {}
 
 suspend fun BehaviourContext.listenMessageEvent(comet: TelegramComet) {
     onContentMessage(
-        { it.chat is PrivateChat || it.chat is GroupChat }
+        { it.chat is PrivateChat || it.chat is GroupChat },
     ) {
         if (it.date < comet.startTime) {
             return@onContentMessage
@@ -48,7 +48,7 @@ suspend fun BehaviourContext.listenMessageEvent(comet: TelegramComet) {
 
 @OptIn(PreviewFeature::class)
 suspend fun CommonMessage<MessageContent>.toCometEvent(
-    comet: TelegramComet
+    comet: TelegramComet,
 ): MessageEvent? {
     if (this !is FromUser && this !is WithSenderChatMessage) {
         return null
@@ -62,7 +62,7 @@ suspend fun CommonMessage<MessageContent>.toCometEvent(
 }
 
 suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
-    comet: TelegramComet
+    comet: TelegramComet,
 ): GroupMessageEvent {
     return when (this) {
         is FromChannelGroupContentMessage<*> -> {
@@ -82,7 +82,7 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
                     comet = comet,
                 ),
                 time = date.unixMillisLong,
-                messageID = messageId
+                messageID = messageId,
             )
         }
 
@@ -103,7 +103,7 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
                     comet = comet,
                 ),
                 time = date.unixMillisLong,
-                messageID = messageId
+                messageID = messageId,
             )
         }
 
@@ -124,14 +124,14 @@ suspend fun CommonGroupContentMessage<MessageContent>.toCometGroupEvent(
                     comet = comet,
                 ),
                 time = date.unixMillisLong,
-                messageID = messageId
+                messageID = messageId,
             )
         }
     }
 }
 
 suspend fun PrivateContentMessage<MessageContent>.toCometPrivateEvent(
-    comet: TelegramComet
+    comet: TelegramComet,
 ): PrivateMessageEvent {
     val sender = from.toCometUser(comet)
 
@@ -149,6 +149,6 @@ suspend fun PrivateContentMessage<MessageContent>.toCometPrivateEvent(
             comet = comet,
         ),
         time = date.unixMillisLong,
-        messageID = messageId
+        messageID = messageId,
     )
 }

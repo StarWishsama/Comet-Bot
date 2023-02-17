@@ -78,6 +78,6 @@ fun levenshteinDistance(s1: String, s2: String, limit: Int = Int.MAX_VALUE): Dou
 fun ldSimilarity(s1: String, s2: String): BigDecimal {
     val ld = levenshteinDistance(s1, s2)
     return BigDecimal.ONE.minus(
-        BigDecimal.valueOf(ld).divide(BigDecimal.valueOf(max(s1.length, s2.length).toLong()), 2, RoundingMode.HALF_UP)
+        BigDecimal.valueOf(ld).divide(BigDecimal.valueOf(max(s1.length, s2.length).toLong()), 2, RoundingMode.HALF_UP),
     )
 }

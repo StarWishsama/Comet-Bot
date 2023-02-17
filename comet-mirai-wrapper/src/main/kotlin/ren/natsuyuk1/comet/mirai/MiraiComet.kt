@@ -74,7 +74,7 @@ class MiraiComet(
                     } catch (e: Exception) {
                         throw NoStandardInputForCaptchaException(e)
                     }
-                })
+                },)
             } else {
                 null
             }
@@ -84,7 +84,9 @@ class MiraiComet(
             try {
                 if (!::miraiBot.isInitialized) {
                     miraiBot = BotFactory.newBot(
-                        qq = this.config.id, password = this.config.password, configuration = config
+                        qq = this.config.id,
+                        password = this.config.password,
+                        configuration = config,
                     )
 
                     miraiBot.eventChannel.parentScope(scope).exceptionHandler {

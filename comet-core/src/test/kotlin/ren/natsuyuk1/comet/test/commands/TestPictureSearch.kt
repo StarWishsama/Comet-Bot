@@ -59,7 +59,7 @@ class TestPictureSearch {
                 fakeSender,
                 fakeSender,
                 testMsg,
-                fakeUser
+                fakeUser,
             ).main("")
         }
 

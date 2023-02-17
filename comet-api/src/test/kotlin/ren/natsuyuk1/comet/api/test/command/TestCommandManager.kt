@@ -26,7 +26,7 @@ class TestCommandManager {
                 sender,
                 subject,
                 wrapper,
-                user
+                user,
             )
         }
         CommandManager.registerCommand(PERMISSION) { comet, sender, subject, wrapper, user ->
@@ -35,7 +35,7 @@ class TestCommandManager {
                 sender,
                 subject,
                 wrapper,
-                user
+                user,
             )
         }
     }
@@ -47,7 +47,7 @@ class TestCommandManager {
                 fakeComet,
                 fakeSender,
                 fakeSender,
-                buildMessageWrapper { appendText("/help") }
+                buildMessageWrapper { appendText("/help") },
             ).join()
         }
     }
@@ -59,7 +59,7 @@ class TestCommandManager {
                 fakeComet,
                 fakeSender,
                 fakeSender,
-                buildMessageWrapper { appendText("/perm") }
+                buildMessageWrapper { appendText("/perm") },
             ).join()
         }
     }

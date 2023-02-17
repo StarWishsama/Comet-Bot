@@ -15,7 +15,7 @@ val RAND = CommandProperty(
     "random",
     listOf("rand", "随机"),
     "生成随机数",
-    "/rand [表达式]"
+    "/rand [表达式]",
 )
 
 class RandCommand(
@@ -23,7 +23,7 @@ class RandCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, RAND) {
     private val exprHelp = """
         表达式 x y 皆为整数

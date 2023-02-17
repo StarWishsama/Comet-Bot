@@ -22,7 +22,7 @@ val MINECRAFT = CommandProperty(
     "minecraft",
     listOf("mc", "我的世界"),
     "查询 Minecraft 服务器信息",
-    "/mc [服务器地址] (端口) (-p java|bedrock 服务器类型)"
+    "/mc [服务器地址] (端口) (-p java|bedrock 服务器类型)",
 )
 
 class MinecraftCommand(
@@ -30,7 +30,7 @@ class MinecraftCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, MINECRAFT) {
     private val protocol by option("-p", "--protocol", help = "服务器协议")
         .enum<MinecraftServerType>(ignoreCase = true).default(MinecraftServerType.JAVA)
@@ -43,9 +43,14 @@ class MinecraftCommand(
     override suspend fun run() {
         var result: QueryInfo?
         val actualPort = if (port == 0) {
-            if (protocol == MinecraftServerType.JAVA) 25565
-            else 19132
-        } else port
+            if (protocol == MinecraftServerType.JAVA) {
+                25565
+            } else {
+                19132
+            }
+        } else {
+            port
+        }
 
         result = try {
             val srvRecord = SRVLookup.lookup(host, "minecraft")

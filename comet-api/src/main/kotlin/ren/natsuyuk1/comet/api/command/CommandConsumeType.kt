@@ -10,6 +10,5 @@
 package ren.natsuyuk1.comet.api.command
 
 enum class CommandConsumeType {
-    COOLDOWN,
-    COIN;
+    COOLDOWN, COIN,
 }

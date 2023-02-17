@@ -16,7 +16,7 @@ data class ProjectSekaiEventList(
     val total: Int,
     val limit: Int,
     val skip: Int,
-    val data: List<EventData>
+    val data: List<EventData>,
 ) {
     @kotlinx.serialization.Serializable
     data class EventData(
@@ -37,6 +37,6 @@ data class ProjectSekaiEventList(
         // 结束时间
         val closedAt: Long,
         // 关店时间
-        val distributionEndAt: Long
+        val distributionEndAt: Long,
     )
 }

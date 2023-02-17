@@ -11,5 +11,5 @@ fun buildImagePreview(url: String) =
         url,
         ImageFormat.JPEG,
         height = 800,
-        weight = 600
+        weight = 600,
     )

@@ -12,7 +12,7 @@ object UUIDSerializer : KSerializer<UUID> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor(
             "ren.natsuyuk1.comet.utils.json.serializers.UUIDSerializer",
-            PrimitiveKind.STRING
+            PrimitiveKind.STRING,
         )
 
     override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())

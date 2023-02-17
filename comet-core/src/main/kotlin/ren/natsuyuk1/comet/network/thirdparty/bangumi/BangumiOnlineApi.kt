@@ -35,8 +35,8 @@ object BangumiOnlineApi {
                 FormDataContent(
                     Parameters.build {
                         append("tz", TimeZone.currentSystemDefault().id)
-                    }
-                )
+                    },
+                ),
             )
         }.bodyAsText().serializeTo(json)
 }

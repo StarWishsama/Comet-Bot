@@ -79,10 +79,14 @@ suspend fun TelegramComet.send(
                 if (ifile == null) {
                     logger.debug { "Unable to convert $img to telegram InputFile" }
                 } else {
-                    val mediaPhoto = if (i == 0) TelegramMediaPhoto(
-                        ifile,
-                        entities = textSource
-                    ) else TelegramMediaPhoto(ifile)
+                    val mediaPhoto = if (i == 0) {
+                        TelegramMediaPhoto(
+                            ifile,
+                            entities = textSource,
+                        )
+                    } else {
+                        TelegramMediaPhoto(ifile)
+                    }
 
                     photos.add(mediaPhoto)
                 }
@@ -114,8 +118,8 @@ suspend fun TelegramComet.send(
             id,
             resp.chat.id.chatId,
             resp.date.unixMillisLong,
-            resp.messageId
-        )
+            resp.messageId,
+        ),
     ).also {
         logger.debug { "Send message costs ${executeTime.getLastingTimeAsString(TimeUnit.MILLISECONDS)}" }
     }
@@ -129,7 +133,6 @@ suspend fun MessageContent.toMessageWrapper(
     msgID: Long,
     comet: TelegramComet,
 ): MessageWrapper {
-
     val receipt = MessageReceipt(comet, MessageSource(type, from, to, time, msgID))
     val textSource = (this as? TextedWithTextSources)?.textSources?.map {
         when (it) {

@@ -22,7 +22,7 @@ object AliasCommandHandler {
         comet: Comet,
         sender: PlatformCommandSender,
         subject: PlatformCommandSender,
-        message: MessageWrapper
+        message: MessageWrapper,
     ) {
         val content = message.encodeToString()
 
@@ -45,7 +45,7 @@ object AliasCommandHandler {
             sender,
             subject,
             convert.toMessageWrapper(),
-            Pair(altar.userLevel, altar.permission)
+            Pair(altar.userLevel, altar.permission),
         )
     }
 }
@@ -54,11 +54,11 @@ object AliasConfig : PersistDataFile<AliasConfig.Data>(
     File(configDirectory, "alias.json"),
     Data.serializer(),
     Data(),
-    readOnly = true
+    readOnly = true,
 ) {
     @Serializable
     data class Data(
-        val alias: MutableMap<String, AliasCommand> = mutableMapOf()
+        val alias: MutableMap<String, AliasCommand> = mutableMapOf(),
     )
 }
 
@@ -66,5 +66,5 @@ object AliasConfig : PersistDataFile<AliasConfig.Data>(
 data class AliasCommand(
     val cmd: String,
     val permission: String = "",
-    val userLevel: UserLevel
+    val userLevel: UserLevel,
 )

@@ -15,5 +15,5 @@ class GroupMessageEvent(
     override val senderName: String,
     override val message: MessageWrapper,
     override val time: Long,
-    override val messageID: Long
+    override val messageID: Long,
 ) : MessageEvent(comet)

@@ -28,7 +28,9 @@ class TestSauceNaoAPI {
 
         runBlocking {
             /* ktlint-disable max-line-length */
-            val fakeImage = Image(url = "https://i.pximg.net/img-master/img/2022/09/05/00/00/21/101003832_p0_master1200.jpg")
+            val fakeImage = Image(
+                url = "https://i.pximg.net/img-master/img/2022/09/05/00/00/21/101003832_p0_master1200.jpg",
+            )
             /* ktlint-enable max-line-length */
             SauceNaoApi.searchByImage(fakeImage).also { it.print() }.toMessageWrapper().print()
         }

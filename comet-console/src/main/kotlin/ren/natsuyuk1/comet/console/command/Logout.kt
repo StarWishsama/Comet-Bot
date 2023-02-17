@@ -18,13 +18,13 @@ internal val LOGOUT = CommandProperty(
     listOf(),
     "注销机器人账号",
     "/logout [id] --platform (登录平台 默认为 MIRAI)\n" +
-        "注意: Telegram 平台下, 你的 ID 为 token 中的数字."
+        "注意: Telegram 平台下, 你的 ID 为 token 中的数字.",
 )
 
 internal class Logout(
     override val sender: ConsoleCommandSender,
     message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : BaseCommand(sender, message, user, LOGIN) {
 
     private val id by argument(name = "账户 ID", help = "登录账户的 ID").long()
@@ -32,7 +32,7 @@ internal class Logout(
     private val platform by option(
         "-p",
         "--platform",
-        help = "登录 Comet 机器人的平台 (例如 MIRAI, Telegram)"
+        help = "登录 Comet 机器人的平台 (例如 MIRAI, Telegram)",
     ).enum<CometPlatform>(true).default(CometPlatform.MIRAI)
 
     override suspend fun run() {

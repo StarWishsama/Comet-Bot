@@ -18,5 +18,5 @@ class MessagePreSendEvent(
     override val comet: Comet,
     val target: Contact,
     val message: MessageWrapper,
-    val timestamp: Long
+    val timestamp: Long,
 ) : CometEvent(comet), CancelableEvent

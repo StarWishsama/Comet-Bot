@@ -22,7 +22,7 @@ fun Member.toGroupMember(comet: MiraiComet): GroupMember {
 
 internal class MiraiGroupMemberImpl(
     override val miraiContact: NormalMember,
-    override val comet: MiraiComet
+    override val comet: MiraiComet,
 ) : MiraiContact, GroupMember {
     override val group: Group
         get() = miraiContact.group.toCometGroup(comet)
@@ -71,7 +71,7 @@ fun NormalMember.toGroupMember(comet: MiraiComet): GroupMember = MiraiGroupMembe
 
 internal class MiraiAnonymousMemberImpl(
     override val miraiContact: AnonymousMember,
-    override val comet: MiraiComet
+    override val comet: MiraiComet,
 ) : ren.natsuyuk1.comet.api.user.AnonymousMember, MiraiContact {
     override val group: Group
         get() = miraiContact.group.toCometGroup(comet)

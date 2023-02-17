@@ -36,7 +36,7 @@ val NOW = CommandProperty(
     "now",
     listOf("time", "时间"),
     "查询时间信息",
-    "/now 查询现在时间"
+    "/now 查询现在时间",
 )
 
 private object Format {
@@ -51,7 +51,7 @@ class NowCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, NOW) {
     companion object {
         // ************************************** $1 * $2 * $3 *******
@@ -154,7 +154,7 @@ class NowCommand(
         subject.sendMessage(
             buildMessageWrapper {
                 appendTextln(timeMessage.await())
-            }
+            },
         )?.delayDelete(1.minutes)
 
         if (subject is Group && subject.getBotPermission() != GroupPermission.MEMBER) {

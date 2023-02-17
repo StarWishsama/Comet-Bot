@@ -24,7 +24,7 @@ data class OldCometUser(
     var r6sAccount: String = "",
     var level: OldUserLevel = OldUserLevel.USER,
     var triggerCommandTime: Long = -1,
-    var genshinGachaPool: Int = 0
+    var genshinGachaPool: Int = 0,
 )
 
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
@@ -55,5 +55,5 @@ fun OldUserLevel.toUserLevel(): UserLevel =
 @Serializable
 data class OldCometPermission(
     val name: String,
-    val defaultLevel: OldUserLevel
+    val defaultLevel: OldUserLevel,
 )

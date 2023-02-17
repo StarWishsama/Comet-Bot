@@ -156,21 +156,21 @@ object ProjectSekaiManager {
             scope.launch {
                 cometClient.client.downloadFile(
                     url + "AllPerfect.png",
-                    b30.resolve("AllPerfect.png").also { it.touch() }
+                    b30.resolve("AllPerfect.png").also { it.touch() },
                 )
             }
 
             scope.launch {
                 cometClient.client.downloadFile(
                     url + "FullCombo.png",
-                    b30.resolve("FullCombo.png").also { it.touch() }
+                    b30.resolve("FullCombo.png").also { it.touch() },
                 )
             }
 
             scope.launch {
                 cometClient.client.downloadFile(
                     url + "b30-background.png",
-                    b30.resolve("b30-background.png").also { it.touch() }
+                    b30.resolve("b30-background.png").also { it.touch() },
                 )
             }
         }

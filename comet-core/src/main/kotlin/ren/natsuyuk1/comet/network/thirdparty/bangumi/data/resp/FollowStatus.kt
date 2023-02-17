@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class FollowStatus(
     val num: String,
     val link: String,
-    val type: FollowType
+    val type: FollowType,
 )
 
 @Serializable

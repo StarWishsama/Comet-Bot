@@ -26,7 +26,7 @@ val DEBUG = CommandProperty(
     description = "调试用命令",
     helpText = "调试命令随时更改, 无帮助文本",
     permissionLevel = UserLevel.OWNER,
-    executeConsumePoint = 0
+    executeConsumePoint = 0,
 )
 
 class DebugCommand(
@@ -39,7 +39,7 @@ class DebugCommand(
     init {
         subcommands(
             Memory(subject, sender, user),
-            Reload(subject, sender, user)
+            Reload(subject, sender, user),
         )
     }
 
@@ -71,7 +71,7 @@ class DebugCommand(
                     ☄ Comet Bot - $version [$branch-$hash]   
                     已运行了 ${coreUpTimer.measureDuration().toFriendly()}
                     Made with ❤
-                            """.trimIndent()
+                            """.trimIndent(),
                         )
                         appendLine()
                         appendLine()
@@ -82,7 +82,7 @@ class DebugCommand(
                         append("JVM Version: ${RuntimeUtil.jvmVersion}")
                         appendLine()
                         append("Running on ${RuntimeUtil.getOsInfo()}")
-                    }.toMessageWrapper()
+                    }.toMessageWrapper(),
                 )
             }
         }
@@ -91,7 +91,7 @@ class DebugCommand(
     class Reload(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        user: CometUser
+        user: CometUser,
     ) : CometSubCommand(subject, sender, user, RELOAD) {
         companion object {
             val RELOAD = SubCommandProperty("reload", parentCommandProperty = DEBUG)
@@ -109,7 +109,7 @@ class DebugCommand(
     class Memory(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        user: CometUser
+        user: CometUser,
     ) : CometSubCommand(subject, sender, user, MEMORY) {
         companion object {
             val MEMORY = SubCommandProperty("memory", listOf("mem"), DEBUG)

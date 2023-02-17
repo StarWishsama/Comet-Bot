@@ -21,7 +21,7 @@ internal interface MiraiContact : Contact {
             comet,
             this,
             message,
-            Clock.System.now().epochSeconds
+            Clock.System.now().epochSeconds,
         ).also { it.broadcast() }
 
         return if (!event.isCancelled) {

@@ -26,7 +26,7 @@ object EmptyMessageWrapper : MessageWrapper()
 @kotlinx.serialization.Serializable
 open class MessageWrapper(
     @Transient
-    val receipt: MessageReceipt? = null
+    val receipt: MessageReceipt? = null,
 ) {
     private val messageContent = mutableListOf<WrapperElement>()
 

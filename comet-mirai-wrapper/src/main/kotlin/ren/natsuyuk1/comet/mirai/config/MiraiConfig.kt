@@ -62,7 +62,7 @@ data class MiraiConfig(
     @Comment("Mirai 心跳策略, 一般情况下无需改动")
     val heartbeatStrategy: BotConfiguration.HeartbeatStrategy = BotConfiguration.HeartbeatStrategy.STAT_HB,
     @Comment("Mirai 心跳周期, 单位为毫秒")
-    val heartbeatPeriodMillis: Long = 60.secondsToMillis
+    val heartbeatPeriodMillis: Long = 60.secondsToMillis,
 ) {
     suspend fun init() {
         val configFile = File(configFile, "mirai-config-$id.yml")

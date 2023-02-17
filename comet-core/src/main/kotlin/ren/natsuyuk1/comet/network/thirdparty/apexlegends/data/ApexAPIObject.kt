@@ -10,7 +10,7 @@ import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 @Serializable
 data class ApexPlayerInfo(
     val error: JsonElement? = null,
-    val global: ApexPlayerGlobalInfo
+    val global: ApexPlayerGlobalInfo,
 ) {
     @Serializable
     data class ApexPlayerGlobalInfo(
@@ -72,5 +72,5 @@ fun ApexPlayerInfo.toMessageWrapper(): MessageWrapper = buildMessageWrapper {
 data class ApexIDInfo(
     val error: JsonElement? = null,
     val name: String,
-    val uid: String
+    val uid: String,
 )

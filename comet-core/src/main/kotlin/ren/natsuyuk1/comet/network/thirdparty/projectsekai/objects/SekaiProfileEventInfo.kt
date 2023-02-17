@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SekaiProfileEventInfo(
-    val rankings: List<EventInfo>
+    val rankings: List<EventInfo>,
 ) {
     fun getScore(): Long = if (rankings.isEmpty()) {
         -1
@@ -31,7 +31,7 @@ data class SekaiProfileEventInfo(
         val name: String,
         val userCard: UserCard,
         val userProfile: UserProfile,
-        val userCheerfulCarnival: UserCheerfulCarnival
+        val userCheerfulCarnival: UserCheerfulCarnival,
     ) {
         @Serializable
         data class UserCard(
@@ -39,7 +39,7 @@ data class SekaiProfileEventInfo(
             val level: Int,
             val masterRank: Int,
             val specialTrainingStatus: String,
-            val defaultImage: String
+            val defaultImage: String,
         )
 
         @Serializable
@@ -48,7 +48,7 @@ data class SekaiProfileEventInfo(
             @SerialName("word")
             val bio: String,
             val twitterId: String,
-            val profileImageType: String
+            val profileImageType: String,
         )
 
         @Serializable
@@ -56,7 +56,7 @@ data class SekaiProfileEventInfo(
             val eventId: Int? = null,
             val cheerfulCarnivalTeamId: Int? = null,
             val teamChangeCount: Int? = null,
-            val registerAt: Long? = null
+            val registerAt: Long? = null,
         )
     }
 }

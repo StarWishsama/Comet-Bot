@@ -38,7 +38,7 @@ data class IssueCommentEventData(
     val action: IssueCommentStatus,
     val issue: IssueEventData.IssueObject,
     val comment: CommentObject,
-    val repository: IssueEventData.RepoInfo
+    val repository: IssueEventData.RepoInfo,
 ) : GitHubEventData {
     @Serializable
     data class CommentObject(
@@ -50,13 +50,13 @@ data class IssueCommentEventData(
         val createdTime: String,
         @SerialName("updated_at")
         val updatedTime: String,
-        val body: String
+        val body: String,
     ) {
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
             return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + hmsPattern.format(
-                localTime
+                localTime,
             )
         }
     }

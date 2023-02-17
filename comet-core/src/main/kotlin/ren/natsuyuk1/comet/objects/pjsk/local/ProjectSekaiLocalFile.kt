@@ -13,7 +13,7 @@ import kotlin.time.Duration
  */
 abstract class ProjectSekaiLocalFile(
     val file: File,
-    private val checkDuration: Duration? = null
+    private val checkDuration: Duration? = null,
 ) {
     /**
      * 加载当前 Project Sekai 游戏数据

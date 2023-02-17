@@ -97,7 +97,7 @@ object NumberUtil {
             kotlinx.datetime.Instant.fromEpochMilliseconds(this)
         } else {
             kotlinx.datetime.Instant.fromEpochSeconds(
-                this
+                this,
             )
         }
 }

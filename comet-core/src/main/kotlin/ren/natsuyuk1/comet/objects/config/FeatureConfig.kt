@@ -12,7 +12,7 @@ object FeatureConfig : PersistDataFile<FeatureConfig.Data>(
     Data.serializer(),
     Data(),
     Yaml,
-    readOnly = true
+    readOnly = true,
 ) {
     @Serializable
     data class Data(
@@ -21,14 +21,14 @@ object FeatureConfig : PersistDataFile<FeatureConfig.Data>(
         @Comment("Project Sekai 相关设置")
         val projectSekaiSetting: ProjectSekaiSetting = ProjectSekaiSetting(),
         @Comment("签到相关设置")
-        val signInSetting: SignInSetting = SignInSetting()
+        val signInSetting: SignInSetting = SignInSetting(),
     )
 
     @Serializable
     data class ArcaeaSetting(
         @Comment(
             "是否启用 Arcaea 相关功能\n" +
-                "启用后, 在下次启动时会自动下载并加载相关数据文件"
+                "启用后, 在下次启动时会自动下载并加载相关数据文件",
         )
         val enable: Boolean = false,
     )
@@ -37,10 +37,10 @@ object FeatureConfig : PersistDataFile<FeatureConfig.Data>(
     data class ProjectSekaiSetting(
         @Comment(
             "是否启用 Project Sekai 相关功能\n" +
-                "启用后, 在下次启动时会自动下载并加载相关数据文件"
+                "启用后, 在下次启动时会自动下载并加载相关数据文件",
         )
         val enable: Boolean = false,
-        val minSimilarity: Double = 0.35
+        val minSimilarity: Double = 0.35,
     )
 
     @Serializable
@@ -61,7 +61,7 @@ object FeatureConfig : PersistDataFile<FeatureConfig.Data>(
         连续签到加成计算公式: 今日签到获得金币/经验 * (一个不大于以下值的随机数 * (签到天数 - 连续签到奖励开始天数))
         且这个倍数不高于下面的最大值
         该加成同时作用于经验和金币
-        """
+        """,
         )
         val accumulateBonus: Double = 0.2,
         @Comment("最大连续签到加成倍数")

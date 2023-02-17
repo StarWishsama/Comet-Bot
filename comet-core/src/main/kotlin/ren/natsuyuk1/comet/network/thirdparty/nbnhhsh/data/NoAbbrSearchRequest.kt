@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NoAbbrSearchRequest(
-    val text: String
+    val text: String,
 )

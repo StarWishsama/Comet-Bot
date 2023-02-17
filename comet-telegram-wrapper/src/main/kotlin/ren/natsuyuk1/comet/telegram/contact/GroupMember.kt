@@ -35,7 +35,7 @@ import kotlin.time.Duration.Companion.seconds
 class TelegramGroupMember(
     override val contact: User,
     private val groupId: ChatId,
-    override val comet: TelegramComet
+    override val comet: TelegramComet,
 ) : GroupMember, TelegramContact {
     @OptIn(PreviewFeature::class)
     override val group: Group
@@ -77,7 +77,7 @@ class TelegramGroupMember(
             groupId,
             id.toChatId(),
             TelegramDate((triggerTime + seconds.seconds).epochSeconds),
-            MUTE
+            MUTE,
         )
     }
 
@@ -108,7 +108,7 @@ class TelegramGroupMember(
             comet.bot.promoteChatMember(
                 chatId = groupId.toChatId(),
                 userId = id.toChatId(),
-                canManageChat = true
+                canManageChat = true,
             )
         } else {
             comet.bot.promoteChatMember(
@@ -123,7 +123,7 @@ class TelegramGroupMember(
                 canRestrictMembers = false,
                 canPinMessages = false,
                 canPromoteMembers = false,
-                canManageChat = null
+                canManageChat = null,
             )
         }
     }
@@ -135,7 +135,7 @@ fun User.toCometGroupMember(comet: TelegramComet, subject: IdChatIdentifier): Gr
 internal class TelegramChannelMemberImpl(
     override val contact: ChannelChat,
     override val comet: TelegramComet,
-    private val groupId: ChatId
+    private val groupId: ChatId,
 ) : AnonymousMember, TelegramContact {
     override val anonymousId: String
         get() = contact.id.chatId.toString()
@@ -159,7 +159,7 @@ internal class TelegramChannelMemberImpl(
             groupId,
             id.toChatId(),
             TelegramDate((triggerTime + seconds.seconds).epochSeconds),
-            MUTE
+            MUTE,
         )
     }
 
@@ -190,7 +190,7 @@ internal class TelegramChannelMemberImpl(
             comet.bot.promoteChatMember(
                 chatId = groupId.toChatId(),
                 userId = id.toChatId(),
-                canManageChat = true
+                canManageChat = true,
             )
         } else {
             comet.bot.promoteChatMember(
@@ -205,7 +205,7 @@ internal class TelegramChannelMemberImpl(
                 canRestrictMembers = false,
                 canPinMessages = false,
                 canPromoteMembers = false,
-                canManageChat = null
+                canManageChat = null,
             )
         }
     }
@@ -246,7 +246,7 @@ internal class TelegramGroupAsMember(
             contact.id,
             id.toChatId(),
             TelegramDate((triggerTime + seconds.seconds).epochSeconds),
-            MUTE
+            MUTE,
         )
     }
 

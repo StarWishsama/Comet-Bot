@@ -29,14 +29,14 @@ object ProjectSekaiEvent {
     suspend fun updateEventTeamImage(eventName: String) {
         cometClient.client.downloadFile(
             buildAssetUrl(eventName, 1),
-            eventImage.resolve("team_1.png").also { it.touch() }
+            eventImage.resolve("team_1.png").also { it.touch() },
         ) {
             it.contentType()?.match(ContentType.Image.PNG) == true
         }
 
         cometClient.client.downloadFile(
             buildAssetUrl(eventName, 2),
-            eventImage.resolve("team_2.png").also { it.touch() }
+            eventImage.resolve("team_2.png").also { it.touch() },
         ) {
             it.contentType()?.match(ContentType.Image.PNG) == true
         }

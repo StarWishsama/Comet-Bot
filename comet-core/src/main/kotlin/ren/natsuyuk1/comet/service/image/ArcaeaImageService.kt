@@ -30,7 +30,7 @@ object ArcaeaImageService {
                 alignment = Alignment.LEFT
                 textStyle = FontUtil.defaultFontStyle(Color.BLACK, 20f)
             },
-            FontUtil.fonts
+            FontUtil.fonts,
         ).apply {
             addText("${user.data.name} - ${user.data.userID} - BEST 30\n")
 

@@ -16,7 +16,7 @@ data class BangumiOnlineScheduleData(
     val code: Int,
     @SerialName("msg")
     val message: String,
-    val data: List<JsonObject>
+    val data: List<JsonObject>,
 ) {
     /**
      * 获取指定星期几下更新的番剧
@@ -46,7 +46,7 @@ data class BangumiOnlineScheduleData(
                                 append("$it | ")
                             }
                         }
-                    }.removeSuffix(" | ")
+                    }.removeSuffix(" | "),
                 )
                 appendLine()
             }

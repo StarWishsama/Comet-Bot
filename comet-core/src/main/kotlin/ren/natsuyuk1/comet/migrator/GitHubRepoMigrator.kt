@@ -25,8 +25,8 @@ object GitHubRepoMigrator : IMigrator {
             for (groupId in this.repoTarget) {
                 result.add(
                     GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber(
-                        groupId
-                    ).also { it.subscribeBranch.addAll(this.branchFilter) }
+                        groupId,
+                    ).also { it.subscribeBranch.addAll(this.branchFilter) },
                 )
             }
 
@@ -52,8 +52,8 @@ object GitHubRepoMigrator : IMigrator {
                             repo.repoName,
                             repo.repoAuthor,
                             repo.repoSecret,
-                            repo.migrateToSubscriber()
-                        )
+                            repo.migrateToSubscriber(),
+                        ),
                     )
                 } else {
                     pendingRemove.add(repo)

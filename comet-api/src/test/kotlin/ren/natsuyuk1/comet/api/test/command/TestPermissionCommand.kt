@@ -14,7 +14,7 @@ val PERMISSION = CommandProperty(
     listOf("perm"),
     "测试权限",
     "测试权限",
-    permissionLevel = UserLevel.OWNER
+    permissionLevel = UserLevel.OWNER,
 )
 
 class TestPermissionCommand(
@@ -22,13 +22,13 @@ class TestPermissionCommand(
     sender: PlatformCommandSender,
     subject: PlatformCommandSender,
     message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, PERMISSION) {
     override suspend fun run() {
         subject.sendMessage(
             buildMessageWrapper {
                 appendText("You have permission!")
-            }
+            },
         )
     }
 }

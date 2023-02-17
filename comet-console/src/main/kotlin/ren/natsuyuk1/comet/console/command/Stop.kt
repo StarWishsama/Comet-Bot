@@ -11,13 +11,13 @@ internal val STOP = CommandProperty(
     "stop",
     listOf(),
     "关闭 Comet Terminal",
-    "/stop 关闭 Comet Terminal"
+    "/stop 关闭 Comet Terminal",
 )
 
 internal class Stop(
     override val sender: ConsoleCommandSender,
     message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : BaseCommand(sender, message, user, STOP) {
 
     override suspend fun run() {

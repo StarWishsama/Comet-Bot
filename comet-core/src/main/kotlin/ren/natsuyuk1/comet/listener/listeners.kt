@@ -6,7 +6,7 @@ import ren.natsuyuk1.comet.api.listener.register
 val DEFAULT_LISTENERS = listOf(
     KeywordListener,
     GroupLeaveListener,
-    AliasCommandListener
+    AliasCommandListener,
 )
 
 fun Comet.registerListeners() =

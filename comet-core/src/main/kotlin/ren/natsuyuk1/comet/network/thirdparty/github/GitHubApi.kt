@@ -59,7 +59,7 @@ object GitHubApi {
         name: String,
         filePath: String,
         page: Int = 1,
-        perPage: Int = 1
+        perPage: Int = 1,
     ): Result<List<GitHubFileCommitInfo>> =
         runCatching<List<GitHubFileCommitInfo>> {
             if (RateLimitService.isRateLimit(RateLimitAPI.GITHUB)) {

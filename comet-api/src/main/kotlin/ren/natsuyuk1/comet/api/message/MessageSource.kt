@@ -5,15 +5,16 @@ open class MessageSource(
     val from: Long,
     val target: Long,
     val time: Long,
-    val messageID: Long
+    val messageID: Long,
 ) {
     enum class MessageSourceType {
         GROUP,
         FRIEND,
         TEMP,
         STRANGER,
+
         /* For Telegram */
-        BOT
+        BOT,
     }
 
     override fun toString(): String = "MessageSource[from=$from, target=$target, time=$time, messageID=$messageID]"

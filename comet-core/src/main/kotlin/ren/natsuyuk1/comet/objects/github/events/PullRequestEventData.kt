@@ -29,7 +29,7 @@ data class PullRequestEventData(
     val pullRequestInfo: PullRequestInfo,
     @SerialName("repository")
     val repository: RepoInfo,
-    val sender: IssueEventData.SenderInfo
+    val sender: IssueEventData.SenderInfo,
 ) : GitHubEventData {
     @Serializable
     data class RepoInfo(
@@ -45,7 +45,7 @@ data class PullRequestEventData(
         @SerialName("owner")
         val owner: JsonElement,
         @SerialName("html_url")
-        val repoUrl: String
+        val repoUrl: String,
     )
 
     @Serializable
@@ -55,13 +55,13 @@ data class PullRequestEventData(
         val title: String,
         val body: String? = null,
         @SerialName("created_at")
-        val createdTime: String
+        val createdTime: String,
     ) {
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
             return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + hmsPattern.format(
-                localTime
+                localTime,
             )
         }
     }

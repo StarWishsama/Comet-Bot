@@ -80,7 +80,7 @@ object SkikoHelper {
                         logger.warn { "下载的 Skiko 文件缺失, 请自行下载." }
                         return
                     },
-                    skikoLib.toPath()
+                    skikoLib.toPath(),
                 )
 
                 if (skikoOsName == "windows") {

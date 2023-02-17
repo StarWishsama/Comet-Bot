@@ -12,7 +12,7 @@ import ren.natsuyuk1.comet.mirai.MiraiComet
 
 internal class MiraiGroupImpl(
     override val miraiContact: net.mamoe.mirai.contact.Group,
-    override val comet: MiraiComet
+    override val comet: MiraiComet,
 ) : Group, MiraiContact {
     override val id: Long = miraiContact.id
 

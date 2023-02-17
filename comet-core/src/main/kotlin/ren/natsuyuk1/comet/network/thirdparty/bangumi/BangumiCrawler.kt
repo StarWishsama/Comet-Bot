@@ -23,7 +23,7 @@ class BangumiCrawler {
     suspend fun fetchSubject(url: String) = withContext(Dispatchers.IO) {
         Subject(
             cometClient.client.get(url).bodyAsText().serializeTo(json)
-                ?: throw IOException("Unable to fetch bangumi page: $url")
+                ?: throw IOException("Unable to fetch bangumi page: $url"),
         )
     }
 
@@ -39,13 +39,13 @@ class BangumiCrawler {
         val url = MAIN_DOMAIN + path + keyword.encodeURLPath()
         return cometClient.client.get("$url?cat=${type.category}${if (exactMode) "&legacy=1" else ""}").bodyAsText()
             .serializeTo(
-                json
+                json,
             ) ?: ""
     }
 
     suspend fun searchSubject(
         type: SearchType.Subject,
         keyword: String,
-        exactMode: Boolean = false
+        exactMode: Boolean = false,
     ): SubjectSearchResults = SubjectSearchResults(rawSearch(type, keyword, exactMode))
 }

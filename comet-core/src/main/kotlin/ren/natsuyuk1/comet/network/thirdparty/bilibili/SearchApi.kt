@@ -19,7 +19,7 @@ object SearchApi {
 
     suspend fun searchUser(
         keyword: String,
-        searchType: SearchOption = SearchOption(SearchType.USER)
+        searchType: SearchOption = SearchOption(SearchType.USER),
     ): SearchNormalData? {
         return biliClient.searchByType(keyword, searchType).data
     }

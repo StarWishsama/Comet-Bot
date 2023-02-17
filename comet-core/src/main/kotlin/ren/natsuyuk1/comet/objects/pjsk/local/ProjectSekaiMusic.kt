@@ -26,7 +26,7 @@ private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiMusic : ProjectSekaiLocalFile(
     pjskFolder.resolve("musics.json"),
-    1.days
+    1.days,
 ) {
     private val musicCoverFolder = pjskFolder.resolve("covers/")
 
@@ -42,7 +42,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
             } else {
                 val music = json.decodeFromString(
                     ListSerializer(ProjectSekaiMusicInfo.serializer()),
-                    content
+                    content,
                 )
 
                 music.forEach {
@@ -66,7 +66,8 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
             if (!file.exists() || lastUpdate > current) {
                 file.touch()
                 if (cometClient.client.downloadFile(
-                        getSekaiBestResourceURL(file.name), file
+                        getSekaiBestResourceURL(file.name),
+                        file,
                     ) == DownloadStatus.OK
                 ) {
                     logger.info { "成功更新音乐数据" }
@@ -90,7 +91,7 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
             val sim = ldSimilarity(it.title.normalize(Normalizer.Form.NFKC), normalizeName)
                 .max(
                     alias.maxOfOrNull { a -> ldSimilarity(a.normalize(Normalizer.Form.NFKC), normalizeName) }
-                        ?: BigDecimal.ZERO
+                        ?: BigDecimal.ZERO,
                 )
 
             sim

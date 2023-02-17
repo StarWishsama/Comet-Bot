@@ -24,7 +24,7 @@ val PUSH_TEMPLATE = CommandProperty(
     /ptl list/ls 列出所有模板
     """.trimIndent(),
     permissionLevel = UserLevel.ADMIN,
-    extraPermissionChecker = groupAdminChecker
+    extraPermissionChecker = groupAdminChecker,
 )
 
 class PushTemplateCommand(
@@ -32,7 +32,7 @@ class PushTemplateCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, PUSH_TEMPLATE) {
     init {
         subcommands(
@@ -40,7 +40,7 @@ class PushTemplateCommand(
             Remove(subject, sender, user),
             Subscribe(subject, sender, user),
             UnSubscribe(subject, sender, user),
-            List(subject, sender, user)
+            List(subject, sender, user),
         )
     }
 
@@ -53,7 +53,7 @@ class PushTemplateCommand(
     class New(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, NEW) {
         companion object {
             val NEW = SubCommandProperty("new", listOf("新建"), PUSH_TEMPLATE)
@@ -73,7 +73,7 @@ class PushTemplateCommand(
     class Remove(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, REMOVE) {
         companion object {
             val REMOVE = SubCommandProperty("remove", listOf("rm", "删除"), PUSH_TEMPLATE)
@@ -89,7 +89,7 @@ class PushTemplateCommand(
     class Subscribe(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, SUBSCRIBE) {
         companion object {
             val SUBSCRIBE = SubCommandProperty("subscribe", listOf("sub", "订阅"), PUSH_TEMPLATE)
@@ -109,7 +109,7 @@ class PushTemplateCommand(
     class UnSubscribe(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, UNSUBSCRIBE) {
         companion object {
             val UNSUBSCRIBE = SubCommandProperty("unsubscribe", listOf("unsub", "退订"), PUSH_TEMPLATE)
@@ -129,7 +129,7 @@ class PushTemplateCommand(
     class List(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, LIST) {
         companion object {
             val LIST = SubCommandProperty("list", listOf("ls"), PUSH_TEMPLATE)

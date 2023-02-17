@@ -38,7 +38,7 @@ enum class DatabaseType {
         override val defaultMaxPoolSize: Int = 10
         override val driverPath: String = "org.postgresql.Driver"
         override val defaultIsolationLevel: String = "REPEATABLE_READ"
-    };
+    }, ;
 
     abstract val defaultConnectionString: String
     abstract val defaultMaxPoolSize: Int
@@ -51,7 +51,7 @@ object DatabaseConfig : PersistDataFile<DatabaseConfig.Data>(
     Data.serializer(),
     Data(),
     Yaml(),
-    readOnly = true
+    readOnly = true,
 ) {
     @Serializable
     data class Data(
@@ -67,7 +67,7 @@ object DatabaseConfig : PersistDataFile<DatabaseConfig.Data>(
         val maxPoolSize: Int = type.defaultMaxPoolSize,
         @Comment("数据库隔离等级, 通常不需要改动")
         @SerialName("isolationLevel")
-        internal val _isolationLevel: String = type.defaultIsolationLevel
+        internal val _isolationLevel: String = type.defaultIsolationLevel,
     ) {
         val isolationLevel: Int
             get() = when (_isolationLevel) {
@@ -77,7 +77,7 @@ object DatabaseConfig : PersistDataFile<DatabaseConfig.Data>(
                 "REPEATABLE_READ" -> TRANSACTION_REPEATABLE_READ
                 "SERIALIZABLE" -> TRANSACTION_SERIALIZABLE
                 else -> error(
-                    "No such field '$_isolationLevel', '${type.defaultIsolationLevel}' is default value for $type"
+                    "No such field '$_isolationLevel', '${type.defaultIsolationLevel}' is default value for $type",
                 )
             }
     }

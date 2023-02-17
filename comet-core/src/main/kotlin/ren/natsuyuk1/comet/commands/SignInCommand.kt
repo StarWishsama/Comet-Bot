@@ -24,7 +24,7 @@ val SIGNIN by lazy {
         "进行签到",
         """
         /sign 进行签到
-        """.trimIndent()
+        """.trimIndent(),
     )
 }
 
@@ -33,7 +33,7 @@ class SignInCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    private val user: CometUser
+    private val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, SIGNIN) {
 
     override suspend fun run() {

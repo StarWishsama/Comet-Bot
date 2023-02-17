@@ -26,7 +26,7 @@ val KEYWORD = CommandProperty(
     "关键词回复",
     "/keyword 关键词回复",
     permissionLevel = UserLevel.ADMIN,
-    extraPermissionChecker = groupAdminChecker
+    extraPermissionChecker = groupAdminChecker,
 )
 
 class KeyWordAddSession(
@@ -34,7 +34,7 @@ class KeyWordAddSession(
     val subject: PlatformCommandSender,
     user: CometUser,
     val keyword: String,
-    private val regex: Boolean
+    private val regex: Boolean,
 ) : Session(contact, user) {
     override suspend fun process(message: MessageWrapper) {
         KeyWordData.addKeyWord(subject.id, subject.platform, KeyWordData.GroupInstance.KeyWord(keyword, message, regex))
@@ -48,7 +48,7 @@ class KeyWordCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    val user: CometUser
+    val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, KEYWORD) {
     private val add by option("--add", "-a", help = "新增关键词")
     private val remove by option("--remove", "-rm", help = "删除关键词")
@@ -103,9 +103,9 @@ class KeyWordCommand(
                                     append("${it.pattern} => ${it.reply.encodeToString().limit(20)}")
                                     appendLine()
                                 }
-                            }.trim()
+                            }.trim(),
                         )
-                    }
+                    },
                 )
             }
 
@@ -122,7 +122,7 @@ class KeyWordCommand(
                  -l, --list 文本     查看本群已有的关键词
                  -r, --regex       是否为正则表达式
                  -h, --help        显示帮助信息
-                    """.trimIndent().toMessageWrapper()
+                    """.trimIndent().toMessageWrapper(),
                 )
             }
         }

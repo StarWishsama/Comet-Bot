@@ -29,7 +29,7 @@ open class ModuleScope(
     parentContext: CoroutineContext = EmptyCoroutineContext,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
     exceptionHandler: (CoroutineContext, Throwable, KLogger, String) -> Unit =
-        { _, e, _, _ -> logger.error(e) { "Caught Exception on $moduleName" } }
+        { _, e, _, _ -> logger.error(e) { "Caught Exception on $moduleName" } },
 ) : CoroutineScope {
 
     val parentJob = SupervisorJob(parentContext[Job])

@@ -21,7 +21,7 @@ import kotlinx.serialization.SerialName
 data class ErrorMessage(
     val message: String,
     @SerialName("documentation_url")
-    val documentationUrl: String
+    val documentationUrl: String,
 ) {
     private val notFound = "Not Found"
 

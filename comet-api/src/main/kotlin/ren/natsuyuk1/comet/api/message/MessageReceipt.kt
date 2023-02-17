@@ -11,7 +11,7 @@ class MessageReceipt(
      */
     val comet: Comet,
 
-    val source: MessageSource
+    val source: MessageSource,
 ) {
     suspend fun delete() {
         comet.deleteMessage(source)

@@ -27,7 +27,7 @@ data class ReleaseEventData(
     val action: String,
     val release: ReleaseInfo,
     val repository: IssueEventData.RepoInfo,
-    val sender: IssueEventData.SenderInfo
+    val sender: IssueEventData.SenderInfo,
 ) : GitHubEventData {
 
     @Serializable
@@ -43,13 +43,13 @@ data class ReleaseEventData(
         val createdTime: String,
         @SerialName("published_at")
         val publishTime: String,
-        val author: IssueEventData.SenderInfo
+        val author: IssueEventData.SenderInfo,
     ) {
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
             return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + hmsPattern.format(
-                localTime
+                localTime,
             )
         }
     }

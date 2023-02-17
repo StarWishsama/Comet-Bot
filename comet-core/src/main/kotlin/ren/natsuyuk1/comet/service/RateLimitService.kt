@@ -9,17 +9,17 @@ import java.io.File
 @Serializable
 enum class RateLimitAPI {
     GITHUB,
-    GITLAB
+    GITLAB,
 }
 
 object RateLimitData : PersistDataFile<RateLimitData.Data>(
     File(dataDirectory, "rate_limit.json"),
     Data.serializer(),
-    Data()
+    Data(),
 ) {
     @Serializable
     data class Data(
-        val rateLimitData: MutableMap<RateLimitAPI, Long> = mutableMapOf()
+        val rateLimitData: MutableMap<RateLimitAPI, Long> = mutableMapOf(),
     )
 }
 

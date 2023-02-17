@@ -29,7 +29,7 @@ data class PingEventData(
     @SerialName("hook")
     val hookInfo: HookInfo,
     @SerialName("repository")
-    val repositoryInfo: RepoInfo
+    val repositoryInfo: RepoInfo,
 ) : GitHubEventData {
     @Serializable
     data class HookInfo(
@@ -37,7 +37,7 @@ data class PingEventData(
         val id: Long,
         val name: String,
         val active: Boolean,
-        val events: List<String>
+        val events: List<String>,
     )
 
     // Ping 事件无需转换

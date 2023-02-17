@@ -7,7 +7,7 @@ import ren.natsuyuk1.comet.objects.github.events.GitHubEventData
 
 class GitHubEvent(
     private val repo: GitHubRepoData.Data.GithubRepo,
-    val eventData: GitHubEventData
+    val eventData: GitHubEventData,
 ) : CometBroadcastEvent() {
     init {
         val eventType = eventData.type()
@@ -30,8 +30,9 @@ class GitHubEvent(
 
             broadcastTargets.add(
                 BroadcastTarget(
-                    BroadcastTarget.BroadcastType.GROUP, sub.id
-                )
+                    BroadcastTarget.BroadcastType.GROUP,
+                    sub.id,
+                ),
             )
         }
     }

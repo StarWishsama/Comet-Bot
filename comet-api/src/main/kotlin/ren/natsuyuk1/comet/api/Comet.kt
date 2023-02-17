@@ -47,7 +47,7 @@ abstract class Comet(
     /**
      * 一个 Comet 实例的 [ModuleScope]
      */
-    var scope: ModuleScope
+    var scope: ModuleScope,
 ) : IComet {
     lateinit var initTime: Instant
 
@@ -80,7 +80,7 @@ fun Comet.attachMessageProcessor() {
                 comet = this,
                 sender = it.sender,
                 subject = it.subject,
-                wrapper = it.message
+                wrapper = it.message,
             )
         }
     }

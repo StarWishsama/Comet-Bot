@@ -77,8 +77,8 @@ class CometUser(id: EntityID<UUID>) : Entity<UUID>(id) {
                 UUID.randomUUID(),
                 object : IdTable<UUID>("fake_table") {
                     override val id: Column<EntityID<UUID>> = uuid("fake_uuid").entityId()
-                }
-            )
+                },
+            ),
         )
 
         fun getUser(id: Long, platform: CometPlatform) = transaction {

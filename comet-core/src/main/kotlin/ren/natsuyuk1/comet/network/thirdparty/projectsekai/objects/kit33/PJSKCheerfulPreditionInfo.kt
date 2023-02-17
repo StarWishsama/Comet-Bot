@@ -23,7 +23,7 @@ data class PJSKCheerfulPreditionInfo(
     private val teamId: Pair<Int, Int>
         get() = Pair(
             teams["0"]?.jsonPrimitive?.int ?: -1,
-            teams["1"]?.jsonPrimitive?.int ?: -1
+            teams["1"]?.jsonPrimitive?.int ?: -1,
         )
 
     val teamName: Pair<String, String>?
@@ -32,7 +32,7 @@ data class PJSKCheerfulPreditionInfo(
 
             Pair(
                 teams[first.toString()]?.jsonPrimitive?.content ?: return null,
-                teams[second.toString()]?.jsonPrimitive?.content ?: return null
+                teams[second.toString()]?.jsonPrimitive?.content ?: return null,
             )
         }
 
@@ -40,7 +40,7 @@ data class PJSKCheerfulPreditionInfo(
         val (first, second) = teamId
         return Pair(
             predictRates[first.toString()]?.jsonPrimitive?.double ?: return null,
-            predictRates[second.toString()]?.jsonPrimitive?.double ?: return null
+            predictRates[second.toString()]?.jsonPrimitive?.double ?: return null,
         )
     }
 
@@ -55,7 +55,7 @@ data class PJSKCheerfulPreditionInfo(
 
         return Pair(
             latest?.get(first.toString())?.jsonPrimitive?.intOrNull ?: return null,
-            latest[second.toString()]?.jsonPrimitive?.intOrNull ?: return null
+            latest[second.toString()]?.jsonPrimitive?.intOrNull ?: return null,
         )
     }
 }

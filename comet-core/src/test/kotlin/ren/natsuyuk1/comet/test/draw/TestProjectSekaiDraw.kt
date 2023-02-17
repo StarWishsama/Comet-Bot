@@ -110,7 +110,7 @@ class TestProjectSekaiDraw {
 
             val result = ProjectSekaiImageService.drawBest30(
                 userInfo,
-                b30
+                b30,
             )
 
             assertTrue(result != null)

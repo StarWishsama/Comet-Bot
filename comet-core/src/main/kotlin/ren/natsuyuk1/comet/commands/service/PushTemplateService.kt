@@ -47,15 +47,15 @@ class PushTemplateNewSession(
                         template,
                         mutableListOf(requestGroup.toCometPushTarget()),
                         url,
-                        token
-                    )
+                        token,
+                    ),
                 )
                 contact.sendMessage(
                     buildMessageWrapper {
                         appendTextln("成功新建推送模板 $templateName! 已自动订阅你发起新建请求的群聊.")
                         appendTextln("你的推送 Token 是 $token")
                         appendText("该 Token 之后无法再获取, 请记好你的 Token.")
-                    }
+                    },
                 )
                 expire()
             }

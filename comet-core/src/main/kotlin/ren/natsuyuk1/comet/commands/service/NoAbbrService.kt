@@ -8,6 +8,6 @@ object NoAbbrService {
     suspend fun PlatformCommandSender.processAbbrSearch(keyword: String) =
         sendMessage(
             NoAbbrApi.search(keyword).firstOrNull()?.toMessageWrapper()
-                ?: "找不到 $keyword 的缩写释义捏".toMessageWrapper()
+                ?: "找不到 $keyword 的缩写释义捏".toMessageWrapper(),
         )
 }

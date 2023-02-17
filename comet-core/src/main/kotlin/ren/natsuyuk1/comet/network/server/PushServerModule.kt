@@ -49,7 +49,7 @@ object PushHandler {
                 val jp = JsonPath.parse(body)
                 PushTemplateReceiveEvent(
                     JsonPathMap(jp),
-                    ptc
+                    ptc,
                 ).broadcast()
 
                 CometResponse(HttpStatusCode.OK, "Comet 已收到推送内容并推送").respond(call)

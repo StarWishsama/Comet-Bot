@@ -14,5 +14,5 @@ class GroupLeaveEvent(
     /**
      * 退出的用户
      */
-    override val user: User
+    override val user: User,
 ) : GroupEvent(comet), IUserEvent

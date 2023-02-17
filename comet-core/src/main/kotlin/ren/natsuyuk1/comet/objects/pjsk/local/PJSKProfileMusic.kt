@@ -1,6 +1,5 @@
 package ren.natsuyuk1.comet.objects.pjsk.local
 
-import io.ktor.http.*
 import kotlinx.serialization.builtins.ListSerializer
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.cometClient
@@ -12,13 +11,14 @@ import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
+import kotlin.collections.set
 import kotlin.time.Duration.Companion.days
 
 private val logger = KotlinLogging.logger {}
 
 object PJSKProfileMusic : ProjectSekaiLocalFile(
     pjskFolder.resolve("musics_pjsekai.json"),
-    2.days
+    2.days,
 ) {
     private const val url = "https://musics.pjsekai.moe/musics.json"
 
@@ -34,7 +34,7 @@ object PJSKProfileMusic : ProjectSekaiLocalFile(
             } else {
                 val music = json.decodeFromString(
                     ListSerializer(ProfileMusicInfo.serializer()),
-                    content
+                    content,
                 )
 
                 music.forEach {

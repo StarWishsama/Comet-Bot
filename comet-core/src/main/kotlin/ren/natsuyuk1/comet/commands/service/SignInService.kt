@@ -61,7 +61,9 @@ object SignInService {
 
         val at = if (sender is GroupMember) {
             sender.at()
-        } else null
+        } else {
+            null
+        }
 
         val checkInResult = buildString {
             append("${getCurrentInstantString()}好, ${sender.name}~")
@@ -146,16 +148,20 @@ object SignInService {
         // 使用随机数工具生成基础硬币
         val coinBase = NumberUtil.round(
             random.nextDouble(
-                FeatureConfig.data.signInSetting.minCoin, FeatureConfig.data.signInSetting.maxCoin
+                FeatureConfig.data.signInSetting.minCoin,
+                FeatureConfig.data.signInSetting.maxCoin,
             ),
-            1, RoundingMode.HALF_DOWN
+            1,
+            RoundingMode.HALF_DOWN,
         ).toDouble()
 
         val expBase = NumberUtil.round(
             random.nextDouble(
-                FeatureConfig.data.signInSetting.minExp, FeatureConfig.data.signInSetting.maxExp
+                FeatureConfig.data.signInSetting.minExp,
+                FeatureConfig.data.signInSetting.maxExp,
             ),
-            1, RoundingMode.HALF_DOWN
+            1,
+            RoundingMode.HALF_DOWN,
         ).toDouble()
 
         // 最大奖励倍数
@@ -164,12 +170,13 @@ object SignInService {
             NumberUtil.round(
                 (
                     random.nextDouble(
-                        0.0, FeatureConfig.data.signInSetting.accumulateBonus
+                        0.0,
+                        FeatureConfig.data.signInSetting.accumulateBonus,
                     ) * (user.checkInTime - FeatureConfig.data.signInSetting.accumulateBonusStart + 1)
                     ),
                 1,
-                RoundingMode.HALF_DOWN
-            ).toDouble()
+                RoundingMode.HALF_DOWN,
+            ).toDouble(),
         )
 
         val multiplier = if (coinBase <= 0) 1.0 else awardProp
@@ -187,7 +194,7 @@ object SignInService {
     internal data class SignInResult(
         val basePoint: Double,
         val awardPoint: Double,
-        val chancePoint: Double
+        val chancePoint: Double,
     ) {
         fun getAllPoint(): Double = basePoint + awardPoint + chancePoint
     }
@@ -197,10 +204,22 @@ object SignInService {
         val checkLDT = checkTime.toLocalDateTime(TimeZone.currentSystemDefault())
 
         val before = LocalDateTime(
-            checkLDT.year, checkLDT.monthNumber, checkLDT.dayOfMonth, 0, 0, 0, 0
+            checkLDT.year,
+            checkLDT.monthNumber,
+            checkLDT.dayOfMonth,
+            0,
+            0,
+            0,
+            0,
         ).toInstant(TimeZone.currentSystemDefault())
         val after = LocalDateTime(
-            checkLDT.year, checkLDT.monthNumber, checkLDT.dayOfMonth, 23, 59, 59, 0
+            checkLDT.year,
+            checkLDT.monthNumber,
+            checkLDT.dayOfMonth,
+            23,
+            59,
+            59,
+            0,
         ).toInstant(TimeZone.currentSystemDefault())
 
         return transaction {
@@ -230,7 +249,8 @@ object SignInService {
 
         return if (randomEvent <= FeatureConfig.data.signInSetting.randomBonusProbability) {
             random.nextDouble(
-                FeatureConfig.data.signInSetting.randomBonusMin, FeatureConfig.data.signInSetting.randomBonusMax
+                FeatureConfig.data.signInSetting.randomBonusMin,
+                FeatureConfig.data.signInSetting.randomBonusMax,
             )
         } else {
             0.0

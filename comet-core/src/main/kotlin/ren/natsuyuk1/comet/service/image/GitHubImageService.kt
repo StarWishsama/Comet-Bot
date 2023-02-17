@@ -37,8 +37,9 @@ object GitHubImageService {
     private const val GITHUB_DEFAULT_WIDTH = 600
 
     suspend fun drawEventInfo(event: GitHubEventData): File? {
-        if (!SkikoHelper.isSkikoLoaded())
+        if (!SkikoHelper.isSkikoLoaded()) {
             return null
+        }
 
         return when (event) {
             is PullRequestEventData -> {
@@ -85,7 +86,7 @@ object GitHubImageService {
             githubLogo.touch()
             cometClient.client.downloadFile(
                 "https://raw.githubusercontent.com/StarWishsama/comet-resource-database/main/github/github_logo.png",
-                githubLogo
+                githubLogo,
             )
         }
     }
@@ -97,7 +98,7 @@ object GitHubImageService {
                 textStyle = FontUtil.defaultFontStyle(Color.BLACK, 21f)
                 gloryFontSetting()
             },
-            FontUtil.fonts
+            FontUtil.fonts,
         ).apply {
             addText(firstLine)
             addText(secondLine)
@@ -109,7 +110,7 @@ object GitHubImageService {
                 alignment = Alignment.LEFT
                 textStyle = FontUtil.defaultFontStyle(Color.BLACK, 15f)
             },
-            FontUtil.fonts
+            FontUtil.fonts,
         ).apply {
             addText("☄ Rendered by Comet")
         }.build().layout(width)
@@ -120,7 +121,7 @@ object GitHubImageService {
                 alignment = Alignment.LEFT
                 textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
             },
-            FontUtil.fonts
+            FontUtil.fonts,
         ).apply {
             addText(eventContent)
         }.build().layout(width)
@@ -131,7 +132,7 @@ object GitHubImageService {
                 alignment = Alignment.LEFT
                 textStyle = FontUtil.defaultFontStyle(Color.BLACK, 18f)
             },
-            FontUtil.fonts
+            FontUtil.fonts,
         ).apply {
             customBuilder(this)
         }.build().layout(width)
@@ -144,7 +145,7 @@ object GitHubImageService {
         val repoInfo = drawHeader(
             "🔧 ${repository.fullName} 有新提交更改\n",
             "由 ${sender.login} 创建于 ${pullRequestInfo.convertCreatedTime()}",
-            GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2 - image.width
+            GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2 - image.width,
         )
 
         val pullRequestBody = drawBody(GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2) {
@@ -161,7 +162,7 @@ object GitHubImageService {
 
         val surface = Surface.makeRasterN32Premul(
             GITHUB_DEFAULT_WIDTH,
-            height
+            height,
         )
 
         surface.canvas.applyDefaultCanvas(image, repoInfo, pullRequestBody, padding)
@@ -181,7 +182,7 @@ object GitHubImageService {
         val repoInfo = drawHeader(
             "⬆️ ${repoInfo.fullName} [${ref.replace(refsPattern, "")}] 有新推送\n",
             "由 ${headCommitInfo.committer.name} 提交于 ${getPushTimeAsString()}",
-            GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2 - image.width
+            GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2 - image.width,
         )
 
         val pushBody = drawBody(buildCommitList(), GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2)
@@ -192,7 +193,7 @@ object GitHubImageService {
 
         val surface = Surface.makeRasterN32Premul(
             GITHUB_DEFAULT_WIDTH,
-            height
+            height,
         )
 
         surface.canvas.applyDefaultCanvas(image, repoInfo, pushBody, padding)

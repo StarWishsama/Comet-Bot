@@ -24,7 +24,7 @@ data class SimpleEpisode(
     override val title: String,
     override val longTitle: String,
     override val url: String,
-    override val category: String? = null
+    override val category: String? = null,
 ) : Episode()
 
 @Serializable
@@ -36,5 +36,5 @@ data class FullEpisode(
     val rawDate: String?,
     val comment: Int,
     override val url: String,
-    override val category: String? = null
+    override val category: String? = null,
 ) : Episode()

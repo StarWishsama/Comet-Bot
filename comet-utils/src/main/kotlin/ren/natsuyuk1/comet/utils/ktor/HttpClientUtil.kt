@@ -50,7 +50,7 @@ fun HttpClientEngineConfig.initProxy() {
 suspend fun HttpClient.downloadFile(
     url: String,
     file: File,
-    verifier: (HttpResponse) -> Boolean = { it.status.isSuccess() }
+    verifier: (HttpResponse) -> Boolean = { it.status.isSuccess() },
 ): DownloadStatus {
     if (downloadFiles.contains(url)) {
         return DownloadStatus.DOWNLOADING

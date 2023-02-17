@@ -6,7 +6,7 @@ import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 
 @Serializable
 data class ProjectSekaiRankSeasonInfo(
-    val rankings: List<RankSeasonInfo>
+    val rankings: List<RankSeasonInfo>,
 ) {
     @Serializable
     data class RankSeasonInfo(
@@ -16,7 +16,7 @@ data class ProjectSekaiRankSeasonInfo(
         val name: String,
         val userCard: SekaiProfileEventInfo.EventInfo.UserCard,
         val userProfile: ProjectSekaiUserInfo.UserProfile,
-        val userRankMatchSeason: SeasonInfo
+        val userRankMatchSeason: SeasonInfo,
     ) {
         @Serializable
         data class SeasonInfo(
@@ -34,7 +34,7 @@ data class ProjectSekaiRankSeasonInfo(
             @SerialName("drawCount")
             val draw: Int,
             @SerialName("penaltyCount")
-            val penalty: Int
+            val penalty: Int,
         )
     }
 
@@ -76,5 +76,5 @@ enum class PJSKRank(val i18n: String) {
     GOLD("黄金"),
     PLATINUM("白金"),
     DIAMOND("钻石"),
-    MASTER("大师")
+    MASTER("大师"),
 }

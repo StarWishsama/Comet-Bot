@@ -14,20 +14,20 @@ fun MemberJoinEvent.toCometEvent(comet: MiraiComet): GroupJoinEvent {
     return when (this) {
         is MemberJoinEvent.Active -> {
             GroupJoinEvent.Normal(
-                member.toGroupMember(comet)
+                member.toGroupMember(comet),
             )
         }
 
         is MemberJoinEvent.Invite -> {
             GroupJoinEvent.Invite(
                 member.toGroupMember(comet),
-                invitor.toGroupMember(comet)
+                invitor.toGroupMember(comet),
             )
         }
 
         is MemberJoinEvent.Retrieve -> {
             GroupJoinEvent.Retrieve(
-                member.toGroupMember(comet)
+                member.toGroupMember(comet),
             )
         }
     }
@@ -67,5 +67,5 @@ fun MemberLeaveEvent.toCometEvent(comet: MiraiComet): GroupLeaveEvent =
     GroupLeaveEvent(
         comet,
         group.toCometGroup(comet),
-        member.toCometUser(comet)
+        member.toCometUser(comet),
     )

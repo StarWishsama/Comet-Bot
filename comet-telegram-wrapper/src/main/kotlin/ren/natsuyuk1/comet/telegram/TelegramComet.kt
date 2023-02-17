@@ -54,7 +54,7 @@ class TelegramComet(
     /**
      * 一个 Comet 实例的 [CometConfig]
      */
-    config: CometConfig
+    config: CometConfig,
 ) : Comet(CometPlatform.TELEGRAM, config, logger, ModuleScope("telegram ${config.id}")) {
     internal val startTime = DateTime.now()
     internal lateinit var username: String
@@ -92,7 +92,7 @@ class TelegramComet(
                     CommandManager.getCommands()
                         .filter { it.value is CommandNode }
                         .map { BotCommand(it.key, it.value.property.description) }
-                        .sortedBy { it.command }
+                        .sortedBy { it.command },
                 )
 
                 listenMessageEvent(this@TelegramComet)
@@ -156,7 +156,8 @@ class TelegramComet(
         return when (receipt.source.type) {
             MessageSource.MessageSourceType.GROUP,
             MessageSource.MessageSourceType.FRIEND,
-            MessageSource.MessageSourceType.BOT -> {
+            MessageSource.MessageSourceType.BOT,
+            -> {
                 send(message, receipt.source.type, receipt.source.from.toChatId(), receipt.source.messageID)
             }
 

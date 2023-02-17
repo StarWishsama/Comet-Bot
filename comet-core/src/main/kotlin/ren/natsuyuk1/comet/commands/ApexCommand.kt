@@ -20,7 +20,7 @@ val APEX by lazy {
         /apex bind [Origin 账号名] - 绑定账号
         /apex info 查询绑定账号用户信息
         """.trimIndent(),
-        executeConsumePoint = 30
+        executeConsumePoint = 30,
     )
 }
 
@@ -29,7 +29,7 @@ class ApexCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    val user: CometUser
+    val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, APEX) {
 
     init {
@@ -52,14 +52,14 @@ class ApexCommand(
     class Bind(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, BIND) {
 
         companion object {
             val BIND = SubCommandProperty(
                 "bind",
                 listOf("绑定"),
-                APEX
+                APEX,
             )
         }
 
@@ -74,20 +74,20 @@ class ApexCommand(
         val comet: Comet,
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, INFO) {
 
         private val username by option(
             "-n",
             "--name",
-            help = "要查询的 Apex 账号名称"
+            help = "要查询的 Apex 账号名称",
         )
 
         companion object {
             val INFO = SubCommandProperty(
                 "info",
                 listOf("查询"),
-                APEX
+                APEX,
             )
         }
 

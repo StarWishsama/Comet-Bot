@@ -10,7 +10,7 @@ val MUTE = ChatPermissions(
     canSendVideoNotes = false,
     canSendVoiceNotes = false,
     canSendPolls = false,
-    canSendOtherMessages = false
+    canSendOtherMessages = false,
 )
 
 val UNMUTE = ChatPermissions(
@@ -21,5 +21,5 @@ val UNMUTE = ChatPermissions(
     canSendVideoNotes = true,
     canSendVoiceNotes = true,
     canSendPolls = true,
-    canSendOtherMessages = true
+    canSendOtherMessages = true,
 )

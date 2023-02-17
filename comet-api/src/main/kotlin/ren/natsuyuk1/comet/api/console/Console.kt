@@ -65,7 +65,7 @@ object Console {
     private fun LineReader.initHistory() {
         setVariable(
             LineReader.HISTORY_FILE,
-            resolveDirectory(HISTORY_FILE)
+            resolveDirectory(HISTORY_FILE),
         )
         DefaultHistory(this).apply {
             addShutdownHook {

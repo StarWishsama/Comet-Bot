@@ -13,7 +13,7 @@ val colorCodeRegex = Regex("§[A-Za-z0-9]")
 data class QueryInfo(
     val payload: String,
     val type: MinecraftServerType,
-    val ping: Long
+    val ping: Long,
 ) {
     fun toMessageWrapper(): MessageWrapper =
         when (type) {

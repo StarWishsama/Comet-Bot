@@ -18,7 +18,7 @@ data class ArcaeaUserInfo(
     @SerialName("cmd")
     val command: ArcaeaCommand,
     @SerialName("data")
-    val data: Data
+    val data: Data,
 ) {
     @Serializable
     data class Data(
@@ -37,7 +37,7 @@ data class ArcaeaUserInfo(
         @SerialName("user_code")
         val userCode: String,
         @SerialName("rating_records")
-        val ratingRecord: JsonArray
+        val ratingRecord: JsonArray,
     )
 
     fun getMessageWrapper(): MessageWrapper = buildMessageWrapper {

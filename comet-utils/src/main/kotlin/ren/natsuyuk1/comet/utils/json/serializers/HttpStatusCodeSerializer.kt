@@ -12,7 +12,7 @@ object HttpStatusCodeSerializer : KSerializer<HttpStatusCode> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor(
             "ren.natsuyuk1.comet.utils.json.serializers.HttpStatusCodeSerializer",
-            PrimitiveKind.INT
+            PrimitiveKind.INT,
         )
 
     override fun deserialize(decoder: Decoder): HttpStatusCode = HttpStatusCode.fromValue(decoder.decodeInt())

@@ -68,8 +68,8 @@ object RuntimeUtil {
                     "| %-4s %-4s %-4s",
                     "初始",
                     (heap.init / byteToMB).formatDigests(),
-                    (nonHeap.init / byteToMB).formatDigests()
-                )
+                    (nonHeap.init / byteToMB).formatDigests(),
+                ),
             )
             append("\n")
             append(
@@ -77,8 +77,8 @@ object RuntimeUtil {
                     "| %-4s %-4s %-4s",
                     "已用",
                     (heap.used / byteToMB).formatDigests(),
-                    (nonHeap.used / byteToMB).formatDigests()
-                )
+                    (nonHeap.used / byteToMB).formatDigests(),
+                ),
             )
             append("\n")
             append(
@@ -86,8 +86,8 @@ object RuntimeUtil {
                     "| %-4s %-4s %-4s",
                     "提交",
                     (heap.committed / byteToMB).formatDigests(),
-                    (nonHeap.committed / byteToMB).formatDigests()
-                )
+                    (nonHeap.committed / byteToMB).formatDigests(),
+                ),
             )
             append("\n")
             append(
@@ -95,8 +95,8 @@ object RuntimeUtil {
                     "| %-4s %-4s %-4s",
                     "最大",
                     (heap.max / byteToMB).formatDigests(),
-                    (nonHeap.max / byteToMB).formatDigests()
-                )
+                    (nonHeap.max / byteToMB).formatDigests(),
+                ),
             )
         }.trim()
     }

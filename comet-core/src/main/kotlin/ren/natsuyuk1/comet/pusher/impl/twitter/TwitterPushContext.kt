@@ -12,7 +12,7 @@ class TwitterPushContext(
     id: String,
     target: List<CometPushTarget>,
     private val tweet: Tweet,
-    private val expansions: TwitterExpansions? = null
+    private val expansions: TwitterExpansions? = null,
 ) : CometPushContext(id, target) {
     override fun normalize(): MessageWrapper = runBlocking {
         tweet.toMessageWrapper(expansions)

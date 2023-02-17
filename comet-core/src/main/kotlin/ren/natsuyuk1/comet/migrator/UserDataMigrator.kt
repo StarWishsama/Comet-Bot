@@ -57,7 +57,7 @@ object UserDataMigrator : IMigrator {
                                 oldTime.hour,
                                 oldTime.minute,
                                 oldTime.second,
-                                oldTime.nano
+                                oldTime.nano,
                             ).toInstant(TimeZone.currentSystemDefault())
                             it[userLevel] = user.level.toUserLevel()
                         }

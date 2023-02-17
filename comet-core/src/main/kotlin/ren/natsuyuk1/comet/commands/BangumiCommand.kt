@@ -21,7 +21,7 @@ val BANGUMI = CommandProperty(
     """
     /bgm search 搜索番剧信息
     /bgm schedule 查询今日番剧放送表    
-    """.trimIndent()
+    """.trimIndent(),
 )
 
 class BangumiCommand(
@@ -29,12 +29,12 @@ class BangumiCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    val user: CometUser
+    val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, BANGUMI) {
     init {
         subcommands(
             Search(subject, sender, user),
-            Schedule(subject, sender, user)
+            Schedule(subject, sender, user),
         )
     }
 
@@ -47,7 +47,7 @@ class BangumiCommand(
     class Search(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, SEARCH) {
         companion object {
             val SEARCH = SubCommandProperty("search", listOf("搜索"), BANGUMI)
@@ -72,7 +72,7 @@ class BangumiCommand(
     class Schedule(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, SCHEDULE) {
         companion object {
             val SCHEDULE = SubCommandProperty("schedule", listOf("搜索", "sch", "calendar", "cal"), BANGUMI)

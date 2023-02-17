@@ -13,7 +13,7 @@ val NOABBR = CommandProperty(
     "nbnhhsh",
     listOf("noabbr", "能不能好好说话"),
     "能不能好好说话 - 查询缩写含义",
-    "/nbnhhsh [缩写] 查询缩写含义"
+    "/nbnhhsh [缩写] 查询缩写含义",
 )
 
 class NoAbbrCommand(
@@ -21,7 +21,7 @@ class NoAbbrCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, NOABBR) {
     private val keyword by argument("搜索关键词")
 

@@ -57,7 +57,7 @@ object GithubWebHookHandler {
                 logger.debug { "检查密钥状态失败" }
                 CometResponse(
                     HttpStatusCode.Unauthorized,
-                    "Check failed"
+                    "Check failed",
                 ).respond(call)
                 return
             }
@@ -76,7 +76,7 @@ object GithubWebHookHandler {
                 } else {
                     CometResponse(
                         HttpStatusCode.InternalServerError,
-                        "推送失败: ${if (event == null) "解析事件失败" else "对应事件不可发送"}"
+                        "推送失败: ${if (event == null) "解析事件失败" else "对应事件不可发送"}",
                     ).respond(call)
                     return
                 }
@@ -110,7 +110,7 @@ object GithubWebHookHandler {
     private suspend fun checkSecretStatus(
         call: ApplicationCall,
         secretStatus: SecretStatus,
-        signature: String?
+        signature: String?,
     ): Boolean {
         return when (secretStatus) {
             SecretStatus.FOUND_WITH_SECRET -> signature != null
@@ -126,7 +126,7 @@ object GithubWebHookHandler {
 
                 CometResponse(
                     HttpStatusCode.NotAcceptable,
-                    "Comet 已收到事件, 但所请求的事件类型不支持"
+                    "Comet 已收到事件, 但所请求的事件类型不支持",
                 ).respond(call)
 
                 false

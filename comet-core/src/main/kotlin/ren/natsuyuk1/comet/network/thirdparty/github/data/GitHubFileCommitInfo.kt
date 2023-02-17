@@ -9,20 +9,20 @@ data class GitHubFileCommitInfo(
     val nodeId: String,
     val commit: CommitInfo,
     @SerialName("html_url")
-    val url: String
+    val url: String,
 ) {
     @Serializable
     data class CommitInfo(
         val author: UserInfo,
         val committer: UserInfo,
         val message: String,
-        val url: String
+        val url: String,
     ) {
         @Serializable
         data class UserInfo(
             val name: String,
             val email: String,
-            val date: String
+            val date: String,
         )
     }
 }

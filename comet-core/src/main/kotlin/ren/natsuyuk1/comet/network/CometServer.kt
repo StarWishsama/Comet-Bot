@@ -6,7 +6,6 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.ratelimit.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ren.natsuyuk1.comet.network.server.githubWebHookModule
 import ren.natsuyuk1.comet.network.server.pushTemplateModule
@@ -58,7 +57,7 @@ object CometServer {
                 connector {
                     port = CometServerConfig.data.port
                 }
-            }
+            },
         )
 
         server.start(false)

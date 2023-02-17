@@ -8,14 +8,14 @@ fun net.mamoe.mirai.event.events.NewFriendRequestEvent.toCometEvent(comet: Mirai
 
 class NewFriendRequestEventImpl(
     private val origin: net.mamoe.mirai.event.events.NewFriendRequestEvent,
-    comet: MiraiComet
+    comet: MiraiComet,
 ) : NewFriendRequestEvent(
     comet,
     eventId = origin.eventId,
     message = origin.message,
     fromId = origin.fromId,
     fromGroupId = origin.fromGroupId,
-    fromNick = origin.fromNick
+    fromNick = origin.fromNick,
 ) {
     override suspend fun accept() {
         origin.accept()

@@ -12,7 +12,7 @@ import ren.natsuyuk1.comet.utils.json.serializers.HttpStatusCodeSerializer
 data class CometResponse(
     @Serializable(with = HttpStatusCodeSerializer::class)
     val code: HttpStatusCode,
-    val message: String
+    val message: String,
 )
 
 fun CometResponse.toJson(): String = json.encodeToString(this)

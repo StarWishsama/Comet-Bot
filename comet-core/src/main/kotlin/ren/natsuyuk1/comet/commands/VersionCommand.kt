@@ -17,7 +17,7 @@ val VERSION by lazy {
         "version",
         listOf("v", "comet"),
         "查看 Comet 的相关信息",
-        "/version - 查看 Comet 的相关信息"
+        "/version - 查看 Comet 的相关信息",
     )
 }
 
@@ -26,7 +26,7 @@ class VersionCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, VERSION) {
 
     override suspend fun run() {
@@ -37,14 +37,14 @@ class VersionCommand(
                     ☄ Comet Bot - $version
                     已运行了 ${coreUpTimer.measureDuration().toFriendly()}
                     Made with ❤
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
                 appendLine()
                 appendLine()
                 append("已加载的服务 >")
                 appendLine()
                 append(WrapperLoader.getServicesInfo())
-            }.toMessageWrapper()
+            }.toMessageWrapper(),
         )
     }
 }

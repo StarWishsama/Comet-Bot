@@ -25,7 +25,7 @@ abstract class VerifySession(
     /**
      * 验证后欲传递到要处理的会话 [Session]
      */
-    private val passTo: Session
+    private val passTo: Session,
 ) : Session(contact, cometUser, interrupt) {
     abstract fun verify(sender: PlatformCommandSender, message: MessageWrapper)
 

@@ -21,7 +21,7 @@ val INFO = CommandProperty(
     "info",
     listOf("cx", "查询"),
     "查询账户信息",
-    "/info 查询账户信息"
+    "/info 查询账户信息",
 )
 
 class InfoCommand(
@@ -29,7 +29,7 @@ class InfoCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    private val user: CometUser
+    private val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, INFO) {
 
     private val leaderboard by option("-L", "--leaderboard").flag(default = false)
@@ -51,7 +51,7 @@ class InfoCommand(
                     }
 
                     trim()
-                }
+                },
             )
 
             return
@@ -63,7 +63,7 @@ class InfoCommand(
                 appendLine()
                 appendTextln("等级 ${user.level} | 硬币 ${user.coin.getBetterNumber()}")
                 appendText("上次签到于 ${yyMMddWithTimePattern.format(user.checkInDate.toJavaInstant())}")
-            }
+            },
         )
     }
 }

@@ -56,7 +56,7 @@ object ProjectSekaiAPI {
 
     private suspend fun CometClient.profileRequest(
         param: String,
-        builder: URLBuilder.(URLBuilder) -> Unit = {}
+        builder: URLBuilder.(URLBuilder) -> Unit = {},
     ): HttpResponse {
         return coroutineScope {
             val unibotReq = async {

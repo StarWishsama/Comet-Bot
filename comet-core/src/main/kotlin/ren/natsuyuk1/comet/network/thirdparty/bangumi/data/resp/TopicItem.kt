@@ -37,5 +37,5 @@ data class SearchTopicItem(
     override val rank: Int?,
 
     override val score: Double?,
-    override val voteCount: Int?
+    override val voteCount: Int?,
 ) : TopicItem()

@@ -41,7 +41,7 @@ val PROJECTSEKAI by lazy {
             "/pjsk pred 查询当前活动结束预测分数\n" +
             "/pjsk info 查询账号信息\n" +
             "/pjsk chart 查询歌曲谱面\n" +
-            "/pjsk music 查询歌曲信息"
+            "/pjsk music 查询歌曲信息",
     )
 }
 
@@ -50,7 +50,7 @@ class ProjectSekaiCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    val user: CometUser
+    val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, PROJECTSEKAI) {
 
     init {
@@ -62,7 +62,7 @@ class ProjectSekaiCommand(
                 Info(subject, sender, user),
                 Best30(subject, sender, user),
                 Chart(subject, sender, user),
-                Music(subject, sender, user)
+                Music(subject, sender, user),
             )
         }
     }
@@ -85,21 +85,21 @@ class ProjectSekaiCommand(
     class Bind(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, BIND) {
 
         companion object {
             val BIND = SubCommandProperty(
                 "bind",
                 listOf("绑定"),
-                PROJECTSEKAI
+                PROJECTSEKAI,
             )
         }
 
         private val userID by option(
             "-i",
             "--id",
-            help = "要绑定的世界计划账号 ID"
+            help = "要绑定的世界计划账号 ID",
         ).long()
 
         override suspend fun run() {
@@ -115,14 +115,14 @@ class ProjectSekaiCommand(
     class Info(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, INFO) {
 
         companion object {
             val INFO = SubCommandProperty(
                 "info",
                 listOf("查询"),
-                PROJECTSEKAI
+                PROJECTSEKAI,
             )
         }
 
@@ -147,14 +147,14 @@ class ProjectSekaiCommand(
     class Event(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, EVENT) {
 
         companion object {
             val EVENT = SubCommandProperty(
                 "event",
                 listOf("活动排名", "活排"),
-                PROJECTSEKAI
+                PROJECTSEKAI,
             )
         }
 
@@ -168,14 +168,14 @@ class ProjectSekaiCommand(
     class Prediction(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, PREDICTION) {
 
         companion object {
             val PREDICTION = SubCommandProperty(
                 "pred",
                 listOf("prediction", "预测", "预测线"),
-                PROJECTSEKAI
+                PROJECTSEKAI,
             )
         }
 
@@ -197,14 +197,14 @@ class ProjectSekaiCommand(
     class Best30(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, BEST30) {
 
         companion object {
             val BEST30 = SubCommandProperty(
                 "best30",
                 listOf("b30"),
-                PROJECTSEKAI
+                PROJECTSEKAI,
             )
         }
 
@@ -216,14 +216,14 @@ class ProjectSekaiCommand(
     class Chart(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, CHART) {
 
         companion object {
             val CHART = SubCommandProperty(
                 "chart",
                 listOf("谱面", "谱面预览"),
-                PROJECTSEKAI
+                PROJECTSEKAI,
             )
         }
 
@@ -245,7 +245,8 @@ class ProjectSekaiCommand(
             }
 
             val (musicInfo, sim) = ProjectSekaiMusic.fuzzyGetMusicInfo(
-                musicName, FeatureConfig.data.projectSekaiSetting.minSimilarity
+                musicName,
+                FeatureConfig.data.projectSekaiSetting.minSimilarity,
             )
 
             val extraInfo = musicInfo?.id?.let { PJSKProfileMusic.getMusicInfo(it) }
@@ -262,7 +263,9 @@ class ProjectSekaiCommand(
             val error: String = if (chartFile.isBlank() || !chartFile.isType("image/png")) {
                 val (_, msg) = ProjectSekaiImageService.drawCharts(musicInfo, diff)
                 msg
-            } else ""
+            } else {
+                ""
+            }
 
             if (error.isNotBlank()) {
                 subject.sendMessage("获取谱面失败, $error".toMessageWrapper())
@@ -283,7 +286,7 @@ class ProjectSekaiCommand(
                             appendTextln("BPM: $bpmText")
                         }
                         appendElement(chartFile.asImage())
-                    }
+                    },
                 )
             }
         }
@@ -292,14 +295,14 @@ class ProjectSekaiCommand(
     class Music(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, MUSIC) {
 
         companion object {
             val MUSIC = SubCommandProperty(
                 "music",
                 listOf("查音乐", "音乐"),
-                PROJECTSEKAI
+                PROJECTSEKAI,
             )
         }
 
@@ -307,7 +310,8 @@ class ProjectSekaiCommand(
 
         override suspend fun run() {
             val (musicInfo, _) = ProjectSekaiMusic.fuzzyGetMusicInfo(
-                musicName, FeatureConfig.data.projectSekaiSetting.minSimilarity
+                musicName,
+                FeatureConfig.data.projectSekaiSetting.minSimilarity,
             )
 
             subject.sendMessage(musicInfo?.toMessageWrapper() ?: "找不到你想要搜索的歌曲哦".toMessageWrapper())

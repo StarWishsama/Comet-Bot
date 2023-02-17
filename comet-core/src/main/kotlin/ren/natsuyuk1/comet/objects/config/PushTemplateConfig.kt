@@ -12,11 +12,11 @@ object PushTemplateConfig : PersistDataFile<PushTemplateConfig.Data>(
     configDirectory.resolve("push_templates.json"),
     Data.serializer(),
     Data(),
-    json
+    json,
 ) {
     @Serializable
     data class Data(
-        val templates: MutableSet<PushTemplate> = mutableSetOf()
+        val templates: MutableSet<PushTemplate> = mutableSetOf(),
     )
 }
 

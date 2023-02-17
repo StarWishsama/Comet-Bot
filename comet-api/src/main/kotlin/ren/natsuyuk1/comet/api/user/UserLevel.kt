@@ -14,5 +14,5 @@ enum class UserLevel {
     PREMIUM,
     ADMIN,
     OWNER,
-    CONSOLE
+    CONSOLE,
 }

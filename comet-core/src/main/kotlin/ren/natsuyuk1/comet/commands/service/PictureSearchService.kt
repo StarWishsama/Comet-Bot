@@ -29,7 +29,7 @@ object PictureSearchService {
             subject,
             user,
             newSuspendedTransaction { PictureSearchConfigTable.getPlatform(user.id.value) }
-                ?: PictureSearchSource.SAUCENAO
+                ?: PictureSearchSource.SAUCENAO,
         ).registerTimeout(30.seconds)
 
         subject.sendMessage("⏳ 接下来, 请在 30s 内发送你要搜索的图片".toMessageWrapper())
@@ -50,7 +50,7 @@ object PictureSearchService {
 class PictureSearchQuerySession(
     contact: PlatformCommandSender,
     cometUser: CometUser?,
-    val source: PictureSearchSource
+    val source: PictureSearchSource,
 ) : Session(contact, cometUser) {
     override suspend fun process(message: MessageWrapper) {
         val image = message.find<Image>()

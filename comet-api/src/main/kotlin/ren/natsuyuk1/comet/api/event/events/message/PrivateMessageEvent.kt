@@ -11,7 +11,7 @@ class PrivateMessageEvent(
     override val senderName: String,
     override val message: MessageWrapper,
     override val time: Long,
-    override val messageID: Long
+    override val messageID: Long,
 ) : IUserEvent, MessageEvent(comet) {
     override val user: User
         get() = sender

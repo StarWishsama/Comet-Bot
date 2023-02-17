@@ -35,7 +35,7 @@ suspend fun FriendMessageEvent.toCometEvent(comet: MiraiComet): PrivateMessageEv
         this.senderName,
         this.message.toMessageWrapper(comet),
         this.time.toLong(),
-        messageID = source.ids.first().toLong()
+        messageID = source.ids.first().toLong(),
     )
 }
 
@@ -49,6 +49,6 @@ suspend fun GroupTempMessageEvent.toCometEvent(comet: MiraiComet): PrivateMessag
         this.senderName,
         this.message.toMessageWrapper(comet),
         this.time.toLong(),
-        messageID = source.ids.first().toLong()
+        messageID = source.ids.first().toLong(),
     )
 }

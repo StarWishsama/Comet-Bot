@@ -66,7 +66,7 @@ suspend fun WrapperElement.toMessageContent(subject: Contact): MessageContent? {
         is Voice -> {
             if (subject !is AudioSupported) {
                 throw UnsupportedOperationException(
-                    "发送语音消息失败: 发送对象必须是好友或群聊!"
+                    "发送语音消息失败: 发送对象必须是好友或群聊!",
                 )
             }
 
@@ -161,5 +161,5 @@ internal fun MessageSource.toMessageSource(): MiraiMessageSource =
         ren.natsuyuk1.comet.api.message.MessageSource.MessageSourceType.values()[kind.ordinal],
         time,
         fromId,
-        targetId
+        targetId,
     )

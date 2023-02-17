@@ -49,7 +49,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
             id: Long,
             password: String,
             platform: CometPlatform,
-            protocol: MiraiLoginProtocol?
+            protocol: MiraiLoginProtocol?,
         ): AccountData {
             val target = transaction { findById(id) }
 
@@ -79,12 +79,12 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
             id: Long,
             password: String,
             platform: CometPlatform,
-            protocol: MiraiLoginProtocol? = null
+            protocol: MiraiLoginProtocol? = null,
         ): AccountOperationResult {
             if (cometInstances.any { it.id == id && it.platform == platform }) {
                 return AccountOperationResult(
                     AccountOperationStatus.ALREADY_LOGON,
-                    "Comet 终端已登录过相同账号!"
+                    "Comet 终端已登录过相同账号!",
                 ).also {
                     logger.warn { it.message }
                 }
@@ -93,7 +93,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
             val service = WrapperLoader.getService(platform)
                 ?: return AccountOperationResult(
                     AccountOperationStatus.NO_WRAPPER,
-                    "未安装 ${platform.name} Wrapper, 请下载 ${platform.name} Wrapper 并放置在 ./modules 下"
+                    "未安装 ${platform.name} Wrapper, 请下载 ${platform.name} Wrapper 并放置在 ./modules 下",
                 ).also {
                     logger.warn { it.message }
                 }
@@ -117,7 +117,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
                                     platform,
                                     protocol,
                                     WrapperLoader.wrapperClassLoader,
-                                    Console.newLineReader("mirai-comet")
+                                    Console.newLineReader("mirai-comet"),
                                 ),
                             )
 
@@ -138,7 +138,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
                                 Mirai $id 登录失败, 请尝试重新登录
                                 Mirai 渠道无法正常通过 Web API 登录,
                                 请在本地登录后复制相关文件登录.    
-                                """.trimIndent()
+                                """.trimIndent(),
                             )
                         }
                     }
@@ -152,8 +152,8 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
                                     platform,
                                     protocol,
                                     WrapperLoader.wrapperClassLoader,
-                                    Console.newLineReader("telegram-comet")
-                                )
+                                    Console.newLineReader("telegram-comet"),
+                                ),
                             )
 
                         cometInstances.push(telegramComet)
@@ -169,7 +169,7 @@ class AccountData(id: EntityID<Long>) : Entity<Long>(id) {
                             cometInstances.remove(telegramComet)
                             AccountOperationResult(
                                 AccountOperationStatus.LOGIN_FAILED,
-                                "Telegram $id 登录失败, 请尝试重新登录"
+                                "Telegram $id 登录失败, 请尝试重新登录",
                             )
                         }
                     }

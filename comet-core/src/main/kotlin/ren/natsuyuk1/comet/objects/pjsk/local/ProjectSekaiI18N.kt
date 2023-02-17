@@ -21,7 +21,7 @@ private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiI18N : ProjectSekaiLocalFile(
     pjskFolder.resolve("cheerful_carnival_teams.json"),
-    3.days
+    3.days,
 ) {
     private var carnivalTeamName: JsonObject? = null
     override suspend fun load() {
@@ -32,7 +32,7 @@ object ProjectSekaiI18N : ProjectSekaiLocalFile(
         GitHubApi.getSpecificFileCommits(
             "StarWishsama",
             "comet-resource-database",
-            "projectsekai/cheerful_carnival_teams.json"
+            "projectsekai/cheerful_carnival_teams.json",
         )
             .onSuccess {
                 val commitTime = Instant.parse(it.first().commit.committer.date)
@@ -43,7 +43,7 @@ object ProjectSekaiI18N : ProjectSekaiLocalFile(
                 if (file.length() == 0L || commitTime > lastModified) {
                     if (cometClient.client.downloadFile(
                             getCometDatabaseURL("cheerful_carnival_teams.json"),
-                            file
+                            file,
                         ) == DownloadStatus.OK
                     ) {
                         logger.info { "成功更新本地化数据" }

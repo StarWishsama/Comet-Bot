@@ -10,7 +10,7 @@ import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 @Serializable
 data class SauceNaoSearchResponse(
     val header: Header,
-    val results: List<SearchResult>
+    val results: List<SearchResult>,
 ) {
     @Serializable
     data class Header(
@@ -30,13 +30,13 @@ data class SauceNaoSearchResponse(
         @SerialName("minimum_similarity")
         val minimumSimilarity: Double,
         @SerialName("query_image")
-        val queryImage: String
+        val queryImage: String,
     )
 
     @Serializable
     data class SearchResult(
         val header: SearchHeader,
-        val data: SearchData
+        val data: SearchData,
     ) {
         @Serializable
         data class SearchHeader(

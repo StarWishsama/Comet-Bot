@@ -8,18 +8,18 @@ import java.io.File
 object GitHubRepoData : PersistDataFile<GitHubRepoData.Data>(
     File(configDirectory, "github_repos.json"),
     Data.serializer(),
-    Data()
+    Data(),
 ) {
     @Serializable
     data class Data(
-        val repos: MutableList<GithubRepo> = mutableListOf()
+        val repos: MutableList<GithubRepo> = mutableListOf(),
     ) {
         @Serializable
         data class GithubRepo(
             val repoName: String,
             val owner: String,
             val secret: String,
-            val subscribers: MutableList<GithubRepoSubscriber>
+            val subscribers: MutableList<GithubRepoSubscriber>,
         ) {
             fun getName(): String = "$owner/$repoName"
 
@@ -28,8 +28,12 @@ object GitHubRepoData : PersistDataFile<GitHubRepoData.Data>(
                 val id: Long,
                 val subscribeBranch: MutableSet<String> = mutableSetOf("master", "main"),
                 val subscribeEvent: MutableSet<String> = mutableSetOf(
-                    "push", "release", "issues", "issue_comment", "pull_request"
-                )
+                    "push",
+                    "release",
+                    "issues",
+                    "issue_comment",
+                    "pull_request",
+                ),
             )
         }
     }

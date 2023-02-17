@@ -33,20 +33,20 @@ abstract class BaseCommand(
      * 该命令的配置 [CommandProperty]
      */
     property: CommandProperty,
-    option: CliktOption = CliktOption()
+    option: CliktOption = CliktOption(),
 ) : CliktCommand(
     name = property.name,
     help = property.helpText,
     invokeWithoutSubcommand = option.invokeWithoutSubCommand,
     printHelpOnEmptyArgs = option.printHelpOnEmptyArgs,
     allowMultipleSubcommands = option.allowMultipleSubcommands,
-    treatUnknownOptionsAsArgs = option.treatUnknownOptionsAsArgs
+    treatUnknownOptionsAsArgs = option.treatUnknownOptionsAsArgs,
 ) {
     class CliktOption(
         val invokeWithoutSubCommand: Boolean = true,
         val printHelpOnEmptyArgs: Boolean = false,
         val allowMultipleSubcommands: Boolean = false,
-        val treatUnknownOptionsAsArgs: Boolean = false
+        val treatUnknownOptionsAsArgs: Boolean = false,
     )
 
     init {
@@ -67,7 +67,7 @@ abstract class CometCommand(
      * 该命令的配置 [CommandProperty]
      */
     val property: CommandProperty,
-    option: CliktOption = CliktOption()
+    option: CliktOption = CliktOption(),
 ) : BaseCommand(sender, message, user, property, option) {
     init {
         context {
@@ -97,7 +97,7 @@ abstract class CometSubCommand(
     open val subject: CommandSender,
     open val sender: CommandSender,
     open val user: CometUser,
-    val property: SubCommandProperty
+    val property: SubCommandProperty,
 ) : CliktCommand(name = property.name) {
     init {
         context {

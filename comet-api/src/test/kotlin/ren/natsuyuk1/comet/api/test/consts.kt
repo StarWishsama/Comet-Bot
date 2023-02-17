@@ -17,7 +17,7 @@ val fakeComet = object : Comet(
     platform = CometPlatform.TEST,
     config = CometConfig(0, "", CometPlatform.TEST),
     logger = logger,
-    scope = ModuleScope("TestInstance")
+    scope = ModuleScope("TestInstance"),
 ) {
     override val id: Long = 0
 

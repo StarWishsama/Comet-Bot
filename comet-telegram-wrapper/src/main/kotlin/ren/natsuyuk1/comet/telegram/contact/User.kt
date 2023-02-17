@@ -6,7 +6,7 @@ import ren.natsuyuk1.comet.telegram.util.getDisplayName
 
 class TelegramUser(
     override val contact: dev.inmo.tgbotapi.types.chat.User,
-    override val comet: TelegramComet
+    override val comet: TelegramComet,
 ) : User, TelegramContact {
     override val name: String = contact.getDisplayName()
     override val id: Long = contact.id.chatId

@@ -18,7 +18,7 @@ val PICTURESEARCH = CommandProperty(
     "以图搜图",
     "/ps 以图搜图" +
         "\n\n/ps source [搜索引擎]",
-    executeConsumePoint = 10
+    executeConsumePoint = 10,
 )
 
 class PictureSearchCommand(
@@ -26,7 +26,7 @@ class PictureSearchCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     message: MessageWrapper,
-    val user: CometUser
+    val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, PICTURESEARCH) {
     init {
         subcommands(Source(subject, sender, user))
@@ -41,13 +41,13 @@ class PictureSearchCommand(
     class Source(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, SOURCE) {
         companion object {
             val SOURCE = SubCommandProperty(
                 "source",
                 listOf("搜索引擎", "ly", "sc"),
-                PICTURESEARCH
+                PICTURESEARCH,
             )
         }
 

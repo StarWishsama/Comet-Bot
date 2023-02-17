@@ -40,7 +40,7 @@ interface ITaskManager {
      */
     fun registerTask(
         delay: Duration,
-        task: suspend () -> Unit
+        task: suspend () -> Unit,
     ): Job
 
     /**
@@ -50,17 +50,17 @@ interface ITaskManager {
      */
     fun registerTask(
         delayMillis: Long,
-        task: suspend () -> Unit
+        task: suspend () -> Unit,
     ): Job
 
     fun registerTaskDelayed(
         delay: Duration,
-        task: suspend () -> Unit
+        task: suspend () -> Unit,
     ): Job
 
     fun registerTask(
         delay: suspend () -> Unit,
-        task: suspend () -> Unit
+        task: suspend () -> Unit,
     ): Job
 
     /**
@@ -123,7 +123,7 @@ object TaskManager : ITaskManager {
      */
     override fun registerTask(
         delay: Duration,
-        task: suspend () -> Unit
+        task: suspend () -> Unit,
     ): Job = scope.launch {
         while (isActive) {
             task()
@@ -138,7 +138,7 @@ object TaskManager : ITaskManager {
      */
     override fun registerTask(
         delayMillis: Long,
-        task: suspend () -> Unit
+        task: suspend () -> Unit,
     ): Job = scope.launch {
         while (isActive) {
             task()
@@ -148,7 +148,7 @@ object TaskManager : ITaskManager {
 
     override fun registerTaskDelayed(
         delay: Duration,
-        task: suspend () -> Unit
+        task: suspend () -> Unit,
     ): Job = scope.launch {
         while (isActive) {
             delay(delay)
@@ -158,7 +158,7 @@ object TaskManager : ITaskManager {
 
     override fun registerTask(
         delay: suspend () -> Unit,
-        task: suspend () -> Unit
+        task: suspend () -> Unit,
     ): Job =
         scope.launch {
             while (isActive) {
@@ -215,7 +215,7 @@ object TaskManager : ITaskManager {
                         transaction {
                             taskData.lastExecution = Clock.System.now()
                         }
-                    }
+                    },
                 ).joinAll()
             }
         }.also {

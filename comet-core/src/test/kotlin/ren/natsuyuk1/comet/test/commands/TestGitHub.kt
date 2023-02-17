@@ -35,8 +35,8 @@ class TestGitHub {
                 "Comet-Bot",
                 "StarWishsama",
                 "",
-                mutableListOf()
-            )
+                mutableListOf(),
+            ),
         )
         runBlocking {
             GithubCommand(
@@ -46,7 +46,7 @@ class TestGitHub {
                 buildMessageWrapper {
                     appendText("setting StarWishsama/Comet-Bot add StarWishsama/Comet-Bot -e pull_request")
                 },
-                fakeUser
+                fakeUser,
             ).main("setting StarWishsama/Comet-Bot add StarWishsama/Comet-Bot -e pull_request").print()
         }
     }

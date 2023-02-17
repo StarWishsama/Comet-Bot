@@ -27,7 +27,7 @@ enum class IssueStateReason(val display: String) {
     COMPLETED("已完成"),
 
     @SerialName("not_planned")
-    NOT_PLANNED("未计划")
+    NOT_PLANNED("未计划"),
 }
 
 @Serializable
@@ -38,7 +38,7 @@ data class IssueEventData(
     val action: String,
     val issue: IssueObject,
     val repository: RepoInfo,
-    val sender: SenderInfo
+    val sender: SenderInfo,
 ) : GitHubEventData {
 
     @Serializable
@@ -55,18 +55,18 @@ data class IssueEventData(
         val body: String?,
         val user: UserObject,
         @SerialName("state_reason")
-        val stateReason: IssueStateReason? = null
+        val stateReason: IssueStateReason? = null,
     ) {
         @Serializable
         data class UserObject(
-            val login: String
+            val login: String,
         )
 
         fun convertCreatedTime(): String {
             val localTime =
                 LocalDateTime.parse(createdTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).atZone(ZoneId.of("UTC"))
             return TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT) + " " + hmsPattern.format(
-                localTime
+                localTime,
             )
         }
     }
@@ -74,7 +74,7 @@ data class IssueEventData(
     @Serializable
     data class SenderInfo(
         val login: String,
-        val id: Long
+        val id: Long,
     )
 
     @Serializable
@@ -95,7 +95,7 @@ data class IssueEventData(
         @SerialName("updated_at")
         val updateTime: String,
         @SerialName("pushed_at")
-        val pushTime: String
+        val pushTime: String,
     )
 
     override fun toMessageWrapper(): MessageWrapper {

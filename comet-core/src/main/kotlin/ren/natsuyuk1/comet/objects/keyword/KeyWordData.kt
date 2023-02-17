@@ -10,24 +10,24 @@ import java.io.File
 object KeyWordData : PersistDataFile<KeyWordData.Data>(
     File(configDirectory, "keywords.json"),
     Data.serializer(),
-    Data()
+    Data(),
 ) {
     @Serializable
     data class Data(
-        val keywords: MutableList<GroupInstance> = mutableListOf()
+        val keywords: MutableList<GroupInstance> = mutableListOf(),
     )
 
     @Serializable
     data class GroupInstance(
         val id: Long,
         val platform: CometPlatform,
-        val words: MutableList<KeyWord>
+        val words: MutableList<KeyWord>,
     ) {
         @Serializable
         data class KeyWord(
             val pattern: String,
             val reply: MessageWrapper,
-            val isRegex: Boolean = false
+            val isRegex: Boolean = false,
         )
     }
 

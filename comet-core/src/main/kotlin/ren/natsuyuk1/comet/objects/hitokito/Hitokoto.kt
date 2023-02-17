@@ -9,7 +9,7 @@ data class Hitokoto(
     @SerialName("from")
     val source: String?,
     @SerialName("from_who")
-    val author: String?
+    val author: String?,
 ) {
     override fun toString(): String {
         return "$content ——${author ?: "无"}(${source ?: "无"})"

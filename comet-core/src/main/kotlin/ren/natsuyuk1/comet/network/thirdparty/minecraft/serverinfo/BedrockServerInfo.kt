@@ -10,7 +10,7 @@ data class BedrockServerInfo(
     val maxOnline: String,
     val gameMode: String,
     val agreement: String,
-    val motd: String
+    val motd: String,
 ) {
     fun toMessageWrapper(usedTime: Long): MessageWrapper =
         buildMessageWrapper {
@@ -22,7 +22,7 @@ data class BedrockServerInfo(
             > MOTD ${motd.replace(colorCodeRegex, "")}
             > 服务器版本 $version
             > 延迟 ${usedTime}ms    
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 

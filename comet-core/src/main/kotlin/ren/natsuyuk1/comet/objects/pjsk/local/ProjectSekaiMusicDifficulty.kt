@@ -17,7 +17,7 @@ private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
     pjskFolder.resolve("musicDifficulties.json"),
-    1.days
+    1.days,
 ) {
     internal val musicDiffDatabase = mutableListOf<PJSKMusicDifficultyInfo>()
 
@@ -28,8 +28,8 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
             musicDiffDatabase.addAll(
                 json.decodeFromString(
                     ListSerializer(PJSKMusicDifficultyInfo.serializer()),
-                    file.readTextBuffered()
-                )
+                    file.readTextBuffered(),
+                ),
             )
         } catch (e: Exception) {
             logger.warn(e) { "解析 Project Sekai 音乐等级偏差值数据时出现问题" }
@@ -40,10 +40,9 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
         file.touch()
 
         if (file.isBlank() || isOutdated()) {
-
             if (cometClient.client.downloadFile(
                     "https://gitlab.com/pjsekai/database/musics/-/raw/main/musicDifficulties.json",
-                    file
+                    file,
                 ) == DownloadStatus.OK
             ) {
                 logger.info { "成功更新音乐等级偏差值数据" }

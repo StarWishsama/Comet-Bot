@@ -152,7 +152,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
                         dummyComet,
                         ConsoleCommandSender,
                         ConsoleCommandSender,
-                        buildMessageWrapper { appendText(Console.readln()) }
+                        buildMessageWrapper { appendText(Console.readln()) },
                     ).join()
                 } catch (e: UserInterruptException) { // Ctrl + C
                     println("请使用 Ctrl + D 退出 Comet 终端")
@@ -208,7 +208,7 @@ class CometTerminalCommand : CliktCommand(name = "comet") {
                             it[AccountDataTable.id].value,
                             it[AccountDataTable.password],
                             it[AccountDataTable.platform],
-                            it[AccountDataTable.protocol]
+                            it[AccountDataTable.protocol],
                         )
                     } catch (e: Throwable) {
                         logger.warn(e) { "登录 ${it[AccountDataTable.id]} (${it[AccountDataTable.platform]}) 失败" }

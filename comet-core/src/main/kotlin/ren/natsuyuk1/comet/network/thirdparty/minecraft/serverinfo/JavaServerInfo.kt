@@ -23,7 +23,7 @@ data class JavaServerInfo(
         @SerialName("name")
         val protocolName: String,
         @SerialName("protocol")
-        val protocolVersion: Int
+        val protocolVersion: Int,
     )
 
     @Serializable
@@ -31,21 +31,21 @@ data class JavaServerInfo(
         @SerialName("max")
         val maxPlayer: Int,
         @SerialName("online")
-        val onlinePlayer: Int
+        val onlinePlayer: Int,
     )
 
     @Serializable
     data class ModInfo(
         val type: String,
         @SerialName("modList")
-        val modList: List<Mod>
+        val modList: List<Mod>,
     ) {
         @Serializable
         data class Mod(
             @SerialName("modid")
             val modID: String,
             @SerialName("version")
-            val version: String
+            val version: String,
         )
     }
 
@@ -79,7 +79,7 @@ Java 版服务器
 > 服务器版本 ${version.protocolName}
 > 延迟 ${ping}ms
 ${if (!modInfo?.modList.isNullOrEmpty()) "> MOD 列表 " + modInfo!!.modList else ""}
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 }

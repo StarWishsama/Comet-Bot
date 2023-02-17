@@ -29,8 +29,8 @@ abstract class AbstractCommandNode<CSender : CommandSender>(
         sender: CSender,
         subject: CSender,
         wrapper: MessageWrapper,
-        user: CometUser
-    ) -> BaseCommand
+        user: CometUser,
+    ) -> BaseCommand,
 )
 
 /**
@@ -46,8 +46,8 @@ class CommandNode(
         sender: PlatformCommandSender,
         subject: PlatformCommandSender,
         wrapper: MessageWrapper,
-        user: CometUser
-    ) -> BaseCommand
+        user: CometUser,
+    ) -> BaseCommand,
 ) : AbstractCommandNode<PlatformCommandSender>(property, subCommandProperty, handler)
 
 /**
@@ -63,6 +63,6 @@ class ConsoleCommandNode(
         sender: ConsoleCommandSender,
         _: ConsoleCommandSender,
         wrapper: MessageWrapper,
-        user: CometUser
-    ) -> BaseCommand
+        user: CometUser,
+    ) -> BaseCommand,
 ) : AbstractCommandNode<ConsoleCommandSender>(property, subCommandProperty, handler)

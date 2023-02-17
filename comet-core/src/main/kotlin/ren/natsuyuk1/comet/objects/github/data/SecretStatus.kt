@@ -25,5 +25,5 @@ enum class SecretStatus {
     /**
      * Comet 不支持的事件
      */
-    UNSUPPORTED_EVENT
+    UNSUPPORTED_EVENT,
 }

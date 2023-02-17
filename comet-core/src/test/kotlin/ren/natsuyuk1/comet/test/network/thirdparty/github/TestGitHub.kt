@@ -16,7 +16,7 @@ class TestGitHub {
         runBlocking {
             println(
                 GitHubApi.getSpecificFileCommits("Sekai-World", "sekai-i18n", "zh-TW/cheerful_carnival_teams.json")
-                    .getOrThrow()
+                    .getOrThrow(),
             )
         }
     }

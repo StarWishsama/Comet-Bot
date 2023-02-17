@@ -15,7 +15,9 @@ class TestAscii2D {
         if (isCI()) return
 
         runBlocking {
-            Ascii2DApi.searchByImage("https://i.pximg.net/img-master/img/2022/04/16/15/45/06/97661462_p0_master1200.jpg".asURLImage()) // ktlint-disable max-line-length
+            Ascii2DApi.searchByImage(
+                "https://i.pximg.net/img-master/img/2022/04/16/15/45/06/97661462_p0_master1200.jpg".asURLImage(),
+            ) // ktlint-disable max-line-length
                 .print()
         }
     }

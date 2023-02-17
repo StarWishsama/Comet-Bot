@@ -17,14 +17,21 @@ import java.lang.ref.SoftReference
 private val logger = KotlinLogging.logger {}
 
 object IpdbConfig : PersistDataFile<IpdbConfig.Data>(
-    File(configDirectory, "ipdb.yml"), Data.serializer(), Data(), Yaml(),
-    readOnly = true
+    File(configDirectory, "ipdb.yml"),
+    Data.serializer(),
+    Data(),
+    Yaml(),
+    readOnly = true,
 ) {
     @Serializable
     data class Data(
         @Comment("是否开启 IP 服务") val enable: Boolean = true,
-        @Comment("IPDB v4 路径") @SerialName("pathV4") private val _pathV4: String? = null,
-        @Comment("IPDB v6 路径") @SerialName("pathV6") private val _pathV6: String? = null,
+        @Comment("IPDB v4 路径")
+        @SerialName("pathV4")
+        private val _pathV4: String? = null,
+        @Comment("IPDB v6 路径")
+        @SerialName("pathV6")
+        private val _pathV6: String? = null,
     ) {
         private fun checkFile(path: String?): File? {
             val file = File(path ?: return null)
@@ -61,7 +68,7 @@ object IpdbConfig : PersistDataFile<IpdbConfig.Data>(
 }
 
 class ConcRef(
-    private val load: suspend () -> Reader?
+    private val load: suspend () -> Reader?,
 ) {
     @Volatile
     private var value: SoftReference<Reader?> = SoftReference(null)

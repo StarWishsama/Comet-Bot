@@ -68,7 +68,7 @@ val defaultCommands: List<AbstractCommandNode<*>> =
                 ProjectSekaiCommand.Info.INFO,
                 ProjectSekaiCommand.Chart.CHART,
                 ProjectSekaiCommand.Music.MUSIC,
-            )
+            ),
         ) { comet, sender, subject, wrapper, user ->
             ProjectSekaiCommand(comet, sender, subject, wrapper, user)
         },
@@ -77,7 +77,7 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         },
         CommandNode(
             BILIBILI,
-            listOf(BiliBiliCommand.User.USER, BiliBiliCommand.Dynamic.DYNAMIC, BiliBiliCommand.Video.VIDEO)
+            listOf(BiliBiliCommand.User.USER, BiliBiliCommand.Dynamic.DYNAMIC, BiliBiliCommand.Video.VIDEO),
         ) { comet, sender, subject, wrapper, user ->
             BiliBiliCommand(comet, sender, subject, wrapper, user)
         },
@@ -91,7 +91,7 @@ val defaultCommands: List<AbstractCommandNode<*>> =
                 GithubCommand.UnSubscribe.UNSUBSCRIBE,
                 GithubCommand.Info.INFO,
                 GithubCommand.Setting.SETTING,
-            )
+            ),
         ) { comet, sender, subject, wrapper, user ->
             GithubCommand(comet, sender, subject, wrapper, user)
         },
@@ -100,52 +100,52 @@ val defaultCommands: List<AbstractCommandNode<*>> =
         },
         CommandNode(
             BANGUMI,
-            listOf(BangumiCommand.Schedule.SCHEDULE, BangumiCommand.Search.SEARCH)
+            listOf(BangumiCommand.Schedule.SCHEDULE, BangumiCommand.Search.SEARCH),
         ) { comet, sender, subject, wrapper, user ->
             BangumiCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
-            NOW
+            NOW,
         ) { comet, sender, subject, wrapper, user ->
             NowCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
-            RAND
+            RAND,
         ) { comet, sender, subject, wrapper, user ->
             RandCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
             ARCAEA,
-            listOf(ArcaeaCommand.Bind.BIND, ArcaeaCommand.Info.INFO, ArcaeaCommand.Best30.BEST30)
+            listOf(ArcaeaCommand.Bind.BIND, ArcaeaCommand.Info.INFO, ArcaeaCommand.Best30.BEST30),
         ) { comet, sender, subject, wrapper, user ->
             ArcaeaCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
-            KEYWORD
+            KEYWORD,
         ) { comet, sender, subject, wrapper, user ->
             KeyWordCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
             TWITTER,
-            listOf(TwitterCommand.Tweet.TWEET, TwitterCommand.User.USER)
+            listOf(TwitterCommand.Tweet.TWEET, TwitterCommand.User.USER),
         ) { comet, sender, subject, wrapper, user ->
             TwitterCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
             RSS,
-            listOf(RSSCommand.Subscribe.SUBSCRIBE, RSSCommand.UnSubscribe.UNSUBSCRIBE, RSSCommand.List.LIST)
+            listOf(RSSCommand.Subscribe.SUBSCRIBE, RSSCommand.UnSubscribe.UNSUBSCRIBE, RSSCommand.List.LIST),
         ) { comet, sender, subject, wrapper, user ->
             RSSCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
             APEX,
-            listOf(ApexCommand.Bind.BIND, ApexCommand.Info.INFO)
+            listOf(ApexCommand.Bind.BIND, ApexCommand.Info.INFO),
         ) { comet, sender, subject, wrapper, user ->
             ApexCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
             PICTURESEARCH,
-            listOf(PictureSearchCommand.Source.SOURCE)
+            listOf(PictureSearchCommand.Source.SOURCE),
         ) { comet, sender, subject, wrapper, user ->
             PictureSearchCommand(comet, sender, subject, wrapper, user)
         },
@@ -161,28 +161,28 @@ val defaultCommands: List<AbstractCommandNode<*>> =
                 PushTemplateCommand.List.LIST,
                 PushTemplateCommand.Subscribe.SUBSCRIBE,
                 PushTemplateCommand.UnSubscribe.UNSUBSCRIBE,
-                PushTemplateCommand.Remove.REMOVE
-            )
+                PushTemplateCommand.Remove.REMOVE,
+            ),
         ) { comet, sender, subject, wrapper, user ->
             PushTemplateCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
-            MUTE
+            MUTE,
         ) { comet, sender, subject, wrapper, user ->
             MuteCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
-            DEBUG
+            DEBUG,
         ) { comet, sender, subject, wrapper, user ->
             DebugCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
-            MINECRAFT
+            MINECRAFT,
         ) { comet, sender, subject, wrapper, user ->
             MinecraftCommand(comet, sender, subject, wrapper, user)
         },
         CommandNode(
-            COIN
+            COIN,
         ) { comet, sender, subject, wrapper, user ->
             CoinCommand(comet, sender, subject, wrapper, user)
         },

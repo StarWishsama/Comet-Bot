@@ -15,5 +15,5 @@ import ren.natsuyuk1.comet.api.user.UserLevel
 @Serializable
 data class CometPermission(
     val nodeName: String,
-    val level: UserLevel
+    val level: UserLevel,
 )

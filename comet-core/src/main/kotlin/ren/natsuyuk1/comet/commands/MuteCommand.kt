@@ -32,7 +32,7 @@ val MUTE = CommandProperty(
     格式为 xdxhxmxs, 例如 1d2h 代表禁言一天两小时
     """.trimIndent(),
     permissionLevel = UserLevel.ADMIN,
-    extraPermissionChecker = groupAdminChecker
+    extraPermissionChecker = groupAdminChecker,
 )
 
 class MuteCommand(
@@ -40,7 +40,7 @@ class MuteCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    val user: CometUser
+    val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, MUTE) {
     private val id by argument("禁言用户").user(message)
 

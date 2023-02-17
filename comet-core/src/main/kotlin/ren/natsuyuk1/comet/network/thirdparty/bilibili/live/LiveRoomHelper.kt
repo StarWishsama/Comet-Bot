@@ -56,5 +56,5 @@ data class SimpleLiveRoomData(
     val roomTitle: String?,
     val liveTime: String?,
     val liveStatus: LiveStatus,
-    val cover: String?
+    val cover: String?,
 )

@@ -22,25 +22,29 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper = buildMessageWrappe
     appendText(
         "EXPERT | Clear ${
         getSpecificLevelMusicCount(
-            MusicDifficulty.EXPERT, MusicPlayResult.CLEAR
+            MusicDifficulty.EXPERT,
+            MusicPlayResult.CLEAR,
         )
         }/${ProjectSekaiMusic.musicDatabase.size} / FC ${
         getSpecificLevelMusicCount(
-            MusicDifficulty.EXPERT, MusicPlayResult.FULL_COMBO
+            MusicDifficulty.EXPERT,
+            MusicPlayResult.FULL_COMBO,
         )
-        } / AP ${getSpecificLevelMusicCount(MusicDifficulty.EXPERT, MusicPlayResult.ALL_PERFECT)}"
+        } / AP ${getSpecificLevelMusicCount(MusicDifficulty.EXPERT, MusicPlayResult.ALL_PERFECT)}",
     )
     appendLine()
     appendText(
         "MASTER | Clear ${
         getSpecificLevelMusicCount(
-            MusicDifficulty.MASTER, MusicPlayResult.CLEAR
+            MusicDifficulty.MASTER,
+            MusicPlayResult.CLEAR,
         )
         }/${ProjectSekaiMusic.musicDatabase.size} / FC ${
         getSpecificLevelMusicCount(
-            MusicDifficulty.MASTER, MusicPlayResult.FULL_COMBO
+            MusicDifficulty.MASTER,
+            MusicPlayResult.FULL_COMBO,
         )
-        } / AP ${getSpecificLevelMusicCount(MusicDifficulty.MASTER, MusicPlayResult.ALL_PERFECT)}"
+        } / AP ${getSpecificLevelMusicCount(MusicDifficulty.MASTER, MusicPlayResult.ALL_PERFECT)}",
     )
 }
 
@@ -56,7 +60,7 @@ data class ProjectSekaiUserInfo(
     val userDecks: List<UserDeck>,
     val userCards: List<UserCard>,
     val userMusics: List<UserMusic>,
-    val userMusicResults: List<MusicResult>
+    val userMusicResults: List<MusicResult>,
 ) {
     fun getBest30Songs(): List<MusicResult> = userMusicResults.filter {
         it.musicDifficulty >= MusicDifficulty.EXPERT && (it.isAllPerfect || it.isFullCombo)
@@ -73,7 +77,7 @@ data class ProjectSekaiUserInfo(
 
         return buildMessageWrapper {
             appendElement(
-                ProjectSekaiImageService.drawBest30(this@ProjectSekaiUserInfo, getBest30Songs())
+                ProjectSekaiImageService.drawBest30(this@ProjectSekaiUserInfo, getBest30Songs()),
             )
         }
     }
@@ -103,18 +107,18 @@ data class ProjectSekaiUserInfo(
         @SerialName("fullComboFlg") val isFullCombo: Boolean,
         @SerialName("fullPerfectFlg") val isAllPerfect: Boolean,
         val mvpCount: Int,
-        val superStarCount: Int
+        val superStarCount: Int,
     )
 
     @Serializable
     data class UserGameData(
-        @SerialName("userGamedata") val userGameData: Data
+        @SerialName("userGamedata") val userGameData: Data,
     ) {
         @Serializable
         data class Data(
             @SerialName("userId") val userID: Long,
             val name: String,
-            @SerialName("rank") val level: Int
+            @SerialName("rank") val level: Int,
         )
     }
 
@@ -122,28 +126,28 @@ data class ProjectSekaiUserInfo(
     data class UserProfile(
         @SerialName("userId") val userID: Long,
         @SerialName("word") val bio: String,
-        @SerialName("twitterId") val twitterID: String
+        @SerialName("twitterId") val twitterID: String,
     )
 
     @Serializable
     data class UserMusic(
         @SerialName("userId") val userID: Long,
         @SerialName("musicId") val musicID: Int,
-        @SerialName("userMusicDifficultyStatuses") val musicStatus: List<MusicStatus>
+        @SerialName("userMusicDifficultyStatuses") val musicStatus: List<MusicStatus>,
     ) {
         @Serializable
         data class MusicStatus(
             @SerialName("musicId") val musicID: Int,
             val musicDifficulty: String,
             val musicDifficultyStatus: String,
-            @SerialName("userMusicResults") val userMusicResult: List<UserMusicResult>
+            @SerialName("userMusicResults") val userMusicResult: List<UserMusicResult>,
         ) {
             @Serializable
             data class UserMusicResult(
                 // easy, normal, hard, expert, master
                 val musicDifficulty: MusicDifficulty,
                 // clear, full_combo, all_perfect
-                val playResult: MusicPlayResult
+                val playResult: MusicPlayResult,
             )
         }
     }
@@ -188,7 +192,7 @@ enum class MusicDifficulty {
     EXPERT,
 
     @SerialName("master")
-    MASTER
+    MASTER,
 }
 
 /**
@@ -205,5 +209,5 @@ enum class MusicPlayResult {
     FULL_COMBO,
 
     @SerialName("full_perfect")
-    ALL_PERFECT
+    ALL_PERFECT,
 }

@@ -26,7 +26,7 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
     Data.serializer(),
     Data(),
     Yaml,
-    readOnly = true
+    readOnly = true,
 ) {
     @Serializable
     data class Data(
@@ -44,8 +44,8 @@ object CometGlobalConfig : PersistDataFile<CometGlobalConfig.Data>(
         /**
          * 进行网络请求时的 User-Agent, 进行部分特殊请求时不使用该 User-Agent
          */
-        @Comment("进行网络请求时的 User-Agent, 进行部分特殊请求时不使用该 User-Agent")
         /* ktlint-disable max-line-length */
+        @Comment("进行网络请求时的 User-Agent, 进行部分特殊请求时不使用该 User-Agent")
         val useragent: String = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41",
         /* ktlint-enable max-line-length */
 

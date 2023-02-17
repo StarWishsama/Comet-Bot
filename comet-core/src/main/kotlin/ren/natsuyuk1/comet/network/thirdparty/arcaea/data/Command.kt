@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Command(
     @SerialName("cmd")
-    val command: ArcaeaCommand
+    val command: ArcaeaCommand,
 )
 
 @Serializable
@@ -24,5 +24,5 @@ enum class ArcaeaCommand {
     SONG_ARTIST,
 
     @SerialName("lookup_result")
-    LOOKUP_RESULT
+    LOOKUP_RESULT,
 }

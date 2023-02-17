@@ -55,12 +55,12 @@ private val rankPosition =
         10000,
         20000,
         50000,
-        100000
+        100000,
     )
 
 internal suspend fun SekaiProfileEventInfo.toMessageWrapper(
     userData: ProjectSekaiUserData?,
-    eventId: Int
+    eventId: Int,
 ): MessageWrapper {
     if (rankings.isEmpty()) {
         return "你还没打这期活动捏".toMessageWrapper()
@@ -81,7 +81,7 @@ internal suspend fun SekaiProfileEventInfo.toMessageWrapper(
                 "离活动结束还有 ${
                 (eventInfo.aggregateTime.toInstant(true) - now)
                     .toFriendly(TimeUnit.SECONDS)
-                }"
+                }",
             )
         }
 
@@ -110,7 +110,7 @@ internal suspend fun SekaiProfileEventInfo.toMessageWrapper(
                 if (rankDiff != 0) {
                     appendText(
                         (if (profile.rank < userData.lastQueryPosition) " ↑ 上升" else " ↓ 下降") +
-                            " ${rankDiff.absoluteValue} 名"
+                            " ${rankDiff.absoluteValue} 名",
                     )
                 }
 
@@ -214,7 +214,7 @@ internal suspend fun ProjectSekaiMusicInfo.toMessageWrapper() =
         } else {
             diff.forEach {
                 appendTextln(
-                    "${it.musicDifficulty}[${it.playLevel}] | ${it.totalNoteCount}"
+                    "${it.musicDifficulty}[${it.playLevel}] | ${it.totalNoteCount}",
                 )
             }
         }

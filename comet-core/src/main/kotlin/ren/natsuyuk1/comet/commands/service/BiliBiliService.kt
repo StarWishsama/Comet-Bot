@@ -39,7 +39,7 @@ object BiliBiliService {
     class BiliBiliUserQuerySession(
         contact: PlatformCommandSender,
         cometUser: CometUser?,
-        private val pendingSearchResult: PendingSearchResult
+        private val pendingSearchResult: PendingSearchResult,
     ) : Session(contact, cometUser) {
         override suspend fun process(message: MessageWrapper) {
             val index = message.encodeToString().toIntOrNull()
@@ -66,7 +66,7 @@ object BiliBiliService {
         subject: PlatformCommandSender,
         sender: PlatformCommandSender,
         id: Long = 0,
-        keyword: String = ""
+        keyword: String = "",
     ) = scope.launch {
         if (id != 0L) {
             queryUser(subject, id)
@@ -86,7 +86,7 @@ object BiliBiliService {
                     BiliBiliUserQuerySession(
                         subject,
                         user,
-                        searchResult
+                        searchResult,
                     ).registerTimeout(15.seconds)
 
                     val request = buildMessageWrapper {
@@ -140,7 +140,7 @@ object BiliBiliService {
                 appendTextln("粉丝 ${card.follower?.getBetterNumber()} | 获赞 ${card.like?.getBetterNumber()}")
                 appendLine()
                 appendText("\uD83D\uDD17 https://space.bilibili.com/${space.mid}")
-            }
+            },
         )
     }
 
@@ -205,7 +205,7 @@ object BiliBiliService {
                 dynamicID.toLongOrNull()
             } else {
                 dynamicPattern.find(dynamicID)?.groupValues?.getOrNull(
-                    1
+                    1,
                 )?.toLongOrNull()
             }
 

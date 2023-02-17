@@ -15,7 +15,7 @@ object AliasCommandListener : CometListener {
             event.comet,
             event.sender,
             event.subject,
-            event.message
+            event.message,
         )
     }
 }

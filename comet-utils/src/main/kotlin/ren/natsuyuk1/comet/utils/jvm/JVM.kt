@@ -13,6 +13,6 @@ inline fun <reified T : Enum<T>> String.asEnumOrNull() = enumValues<T>().firstOr
 
 fun addShutdownHook(block: () -> Unit) {
     Runtime.getRuntime().addShutdownHook(
-        Thread { block() }
+        Thread { block() },
     )
 }

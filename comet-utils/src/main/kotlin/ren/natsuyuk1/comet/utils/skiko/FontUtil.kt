@@ -31,7 +31,7 @@ object FontUtil {
                     fontProvider.registerTypeface(
                         Typeface.makeFromFile(f.absPath).also {
                             logger.debug { "Init typeface ${it.familyName}" }
-                        }
+                        },
                     )
                     counter++
                 } catch (e: Exception) {
@@ -46,12 +46,12 @@ object FontUtil {
     fun defaultFont(
         size: Float,
         fontFamily: Array<String> = defaultFont,
-        style: FontStyle = FontStyle.NORMAL.withWeight(500)
+        style: FontStyle = FontStyle.NORMAL.withWeight(500),
     ): Font {
         val typeface =
             fonts.findTypefaces(
                 familyNames = fontFamily,
-                style = style
+                style = style,
             ).firstOrNull()
         return Font(typeface, size).apply {
             edging = FontEdging.SUBPIXEL_ANTI_ALIAS
@@ -64,7 +64,7 @@ object FontUtil {
         c: Color,
         size: Float,
         fontFamily: Array<String> = defaultFont,
-        style: FontStyle = FontStyle.NORMAL.withWeight(500)
+        style: FontStyle = FontStyle.NORMAL.withWeight(500),
     ) = TextStyle().apply {
         color = c.rgb
         fontSize = size
@@ -76,7 +76,7 @@ object FontUtil {
         fontRastrSettings = FontRastrSettings(
             FontEdging.SUBPIXEL_ANTI_ALIAS,
             FontHinting.FULL,
-            true
+            true,
         )
     }
 }

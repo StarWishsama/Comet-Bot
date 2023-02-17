@@ -59,7 +59,7 @@ object EventManager {
      * @return [Flow]
      */
     fun getEventFlow(
-        priority: EventPriority = EventPriority.NORMAL
+        priority: EventPriority = EventPriority.NORMAL,
     ): Flow<Event> {
         return registeredChannelListener.first { it.priority == priority }.channel.receiveAsFlow()
     }
@@ -75,7 +75,7 @@ object EventManager {
      */
     fun registerEventListener(
         priority: EventPriority = EventPriority.NORMAL,
-        listener: suspend (Event) -> Unit
+        listener: suspend (Event) -> Unit,
     ) {
         registeredListener.first { it.priority == priority }.listeners.add(listener)
     }
@@ -91,7 +91,7 @@ object EventManager {
      */
     fun registerBlockEventListener(
         priority: EventPriority = EventPriority.NORMAL,
-        listener: suspend (Event) -> Unit
+        listener: suspend (Event) -> Unit,
     ) {
         registeredBlockListener.first { it.priority == priority }.listeners.add(listener)
     }
@@ -191,7 +191,7 @@ object EventManager {
 suspend inline fun <reified T : Event> nextEvent(
     timeoutMs: Long = 1000,
     priority: EventPriority = EventPriority.NORMAL,
-    noinline filter: (T) -> Boolean = { true }
+    noinline filter: (T) -> Boolean = { true },
 ) = withTimeout(timeoutMs) {
     EventManager.getEventFlow(priority).firstOrNull { if (it is T) filter(it) else false }
 }
@@ -211,7 +211,7 @@ suspend inline fun <reified T : Event> nextEvent(
  */
 inline fun <reified T : Event> registerListener(
     priority: EventPriority = EventPriority.NORMAL,
-    noinline listener: suspend (T) -> Unit
+    noinline listener: suspend (T) -> Unit,
 ) {
     EventManager.registerEventListener(priority) {
         if (it is T) {
@@ -223,7 +223,7 @@ inline fun <reified T : Event> registerListener(
 fun registerListener(
     eventClass: KClass<out Event>,
     priority: EventPriority = EventPriority.NORMAL,
-    listener: suspend (Event) -> Unit
+    listener: suspend (Event) -> Unit,
 ) {
     EventManager.registerEventListener(priority) {
         if (it::class == eventClass) {
@@ -247,7 +247,7 @@ fun registerListener(
  */
 inline fun <reified T : Event> registerBlockListener(
     priority: EventPriority = EventPriority.NORMAL,
-    noinline listener: suspend (T) -> Unit
+    noinline listener: suspend (T) -> Unit,
 ) {
     EventManager.registerBlockEventListener(priority) {
         if (it is T) {
@@ -264,7 +264,7 @@ inline fun <reified T : Event> registerBlockListener(
  * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
  */
 suspend inline fun <T : Event, R> T.broadcastEvent(
-    noinline ifNotCancel: suspend (T) -> R
+    noinline ifNotCancel: suspend (T) -> R,
 ): R? {
     val isCancelled = EventManager.broadcastEvent(this)
     return if (!isCancelled) ifNotCancel(this) else null
@@ -278,7 +278,7 @@ suspend inline fun <T : Event, R> T.broadcastEvent(
  * @param ifCancelled lambda block with the action if broadcasted event has been cancelled
  */
 suspend inline fun <T : Event, R> T.broadcastEventIfCancelled(
-    noinline ifCancelled: suspend (T) -> R
+    noinline ifCancelled: suspend (T) -> R,
 ): R? {
     val isCancelled = EventManager.broadcastEvent(this)
     return if (isCancelled) ifCancelled(this) else null
@@ -293,7 +293,7 @@ suspend inline fun <T : Event, R> T.broadcastEventIfCancelled(
  */
 suspend inline fun <T : Event, R> T.broadcastEvent(
     noinline ifNotCancel: suspend (T) -> R,
-    noinline ifCancelled: suspend (T) -> R
+    noinline ifCancelled: suspend (T) -> R,
 ): R {
     val isCancelled = EventManager.broadcastEvent(this)
     return if (!isCancelled) ifNotCancel(this) else ifCancelled(this)
@@ -310,7 +310,7 @@ object EventManagerConfig : PersistDataFile<EventManagerConfig.Data>(
     File(configDirectory, "eventManagerConfig.yaml"),
     Data.serializer(),
     Data(),
-    Yaml
+    Yaml,
 ) {
 
     @kotlinx.serialization.Serializable
@@ -318,16 +318,16 @@ object EventManagerConfig : PersistDataFile<EventManagerConfig.Data>(
         @Comment("Single event listener timeout in ms")
         val blockListenerTimeout: Long = 1000 * 30L,
         @Comment("All event listeners timeout in ms")
-        val waitingAllBlockListenersTimeout: Long = 3 * blockListenerTimeout
+        val waitingAllBlockListenersTimeout: Long = 3 * blockListenerTimeout,
     )
 }
 
 internal data class PriorityEntry(
     val priority: EventPriority,
-    val listeners: ConcurrentLinkedQueue<suspend (Event) -> Unit>
+    val listeners: ConcurrentLinkedQueue<suspend (Event) -> Unit>,
 )
 
 internal data class PriorityChannelEntry(
     val priority: EventPriority,
-    val channel: Channel<Event>
+    val channel: Channel<Event>,
 )

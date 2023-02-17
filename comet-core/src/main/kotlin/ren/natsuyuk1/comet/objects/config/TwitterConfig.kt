@@ -11,7 +11,7 @@ object TwitterConfig : PersistDataFile<TwitterConfig.Data>(
     Data.serializer(),
     Data(),
     Yaml(),
-    readOnly = true
+    readOnly = true,
 ) {
     @kotlinx.serialization.Serializable
     data class Data(

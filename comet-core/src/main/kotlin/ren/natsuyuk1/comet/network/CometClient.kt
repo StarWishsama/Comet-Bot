@@ -16,5 +16,5 @@ import kotlin.coroutines.CoroutineContext
 
 class CometClient(
     var client: HttpClient = defaultClient,
-    val context: CoroutineContext = CoroutineName("comet-client")
+    val context: CoroutineContext = CoroutineName("comet-client"),
 )

@@ -20,7 +20,7 @@ val ARCAEA by lazy {
         /arc bind -i [账号 ID] - 绑定账号
         /arc info (账号 ID) 查询绑定账号用户信息
         """.trimIndent(),
-        executeConsumePoint = 15
+        executeConsumePoint = 15,
     )
 }
 
@@ -29,7 +29,7 @@ class ArcaeaCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    val user: CometUser
+    val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, ARCAEA) {
 
     init {
@@ -37,7 +37,7 @@ class ArcaeaCommand(
             subcommands(
                 Bind(subject, sender, user),
                 Info(comet, subject, sender, user),
-                Best30(comet, subject, sender, user)
+                Best30(comet, subject, sender, user),
             )
         }
     }
@@ -60,21 +60,21 @@ class ArcaeaCommand(
     class Bind(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, BIND) {
 
         companion object {
             val BIND = SubCommandProperty(
                 "bind",
                 listOf("绑定"),
-                ARCAEA
+                ARCAEA,
             )
         }
 
         private val userID by option(
             "-i",
             "--id",
-            help = "要绑定的 Arcaea 账号 ID"
+            help = "要绑定的 Arcaea 账号 ID",
         )
 
         override suspend fun run() {
@@ -91,20 +91,20 @@ class ArcaeaCommand(
         val comet: Comet,
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, INFO) {
 
         private val userID by option(
             "-i",
             "--id",
-            help = "要查询的 Arcaea 账号 ID"
+            help = "要查询的 Arcaea 账号 ID",
         )
 
         companion object {
             val INFO = SubCommandProperty(
                 "info",
                 listOf("查询"),
-                ARCAEA
+                ARCAEA,
             )
         }
 
@@ -128,14 +128,14 @@ class ArcaeaCommand(
         val comet: Comet,
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, BEST30) {
 
         companion object {
             val BEST30 = SubCommandProperty(
                 "best30",
                 listOf("b30"),
-                ARCAEA
+                ARCAEA,
             )
         }
 

@@ -66,5 +66,5 @@ data class GroupSetting(
     val id: Long,
     val platform: CometPlatform,
     var autoAcceptJoinRequest: Boolean = false,
-    var allowRepeatMessage: Boolean = false
+    var allowRepeatMessage: Boolean = false,
 )

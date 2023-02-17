@@ -109,7 +109,7 @@ class Subject(override val htmlPage: String) : Parser(), Unique {
                 Tag(
                     name = it?.children()?.byTag("span")?.firstOrNull()?.text() ?: return@map null,
                     url = MAIN_DOMAIN + it.attr("href"),
-                    count = it.children().byClass("grey")?.text()?.toIntOrNull() ?: return@map null
+                    count = it.children().byClass("grey")?.text()?.toIntOrNull() ?: return@map null,
                 )
             }?.filterNotNull().orEmpty().toList()
     }
@@ -155,7 +155,7 @@ class Subject(override val htmlPage: String) : Parser(), Unique {
                 title = it.text(),
                 longTitle = it.attr("title"),
                 url = MAIN_DOMAIN + it.attr("href"),
-                category = category
+                category = category,
             )
         }
 
@@ -173,7 +173,7 @@ class Subject(override val htmlPage: String) : Parser(), Unique {
                 FollowStatus(
                     num = num ?: return@map null,
                     link = MAIN_DOMAIN + path,
-                    type = type ?: return@map null
+                    type = type ?: return@map null,
                 )
             }.filterNotNull().toList()
     }

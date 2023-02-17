@@ -20,13 +20,13 @@ internal val PROMOTE = CommandProperty(
     "promote",
     listOf(),
     "提升用户权限等级",
-    "promote [id] -p/--platform=[平台]"
+    "promote [id] -p/--platform=[平台]",
 )
 
 internal class Promote(
     override val sender: ConsoleCommandSender,
     message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : BaseCommand(sender, message, user, STOP) {
 
     private val id by argument("QQ/Telegram 平台用户ID").long()

@@ -13,6 +13,6 @@ data class ProfileMusicInfo(
     data class MusicBpmInfo(
         val bar: Float,
         val bpm: Float,
-        val duration: Double
+        val duration: Double,
     )
 }

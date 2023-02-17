@@ -38,7 +38,10 @@ private val logger = KotlinLogging.logger {}
 
 val IP by lazy {
     CommandProperty(
-        "ip", emptyList(), "查询 IP 或域名归属", "/ip <IP>"
+        "ip",
+        emptyList(),
+        "查询 IP 或域名归属",
+        "/ip <IP>",
     )
 }
 
@@ -55,7 +58,7 @@ class IPCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     private val message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, IP) {
     private val link by argument("LINK", "IP 或域名").optional()
     private val language by option("-l", "--language", help = "要显示的语言")

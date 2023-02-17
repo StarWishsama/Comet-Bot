@@ -24,7 +24,7 @@ import ren.natsuyuk1.comet.telegram.TelegramComet
 
 internal class TelegramGroup(
     override val contact: GroupChat,
-    override val comet: TelegramComet
+    override val comet: TelegramComet,
 ) : Group, TelegramContact {
     override val id: Long = contact.id.chatId
 

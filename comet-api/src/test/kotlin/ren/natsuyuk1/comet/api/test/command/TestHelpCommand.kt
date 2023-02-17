@@ -27,7 +27,7 @@ val HELP by lazy {
         "help",
         listOf("?"),
         "展示 Comet 的帮助菜单",
-        "输入 /help 查询命令列表"
+        "输入 /help 查询命令列表",
     )
 }
 
@@ -36,18 +36,18 @@ class TestHelpCommand(
     sender: PlatformCommandSender,
     subject: PlatformCommandSender,
     message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) :
     CometCommand(comet, sender, subject, message, user, HELP) {
 
     private val pageNum by argument(
-        name = "帮助菜单的页数"
+        name = "帮助菜单的页数",
     ).int().default(1)
 
     private val pageSize by option(
         "--page-size",
         "-s",
-        help = "帮助菜单一页展示的命令个数"
+        help = "帮助菜单一页展示的命令个数",
     ).int().convert {
         it.coerceIn(1..20)
     }.default(10)
@@ -80,7 +80,7 @@ class TestHelpCommand(
                     }
                     appendLine()
                 }
-            }
+            },
         )
     }
 }

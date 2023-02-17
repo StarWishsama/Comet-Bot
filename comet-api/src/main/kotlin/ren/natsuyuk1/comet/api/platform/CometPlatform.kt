@@ -17,5 +17,5 @@ enum class CometPlatform(val needRestrict: Boolean = false) {
     /**
      * Represent to unit test
      */
-    TEST
+    TEST,
 }

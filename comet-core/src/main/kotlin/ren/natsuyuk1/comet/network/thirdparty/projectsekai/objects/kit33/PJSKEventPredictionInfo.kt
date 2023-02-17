@@ -23,7 +23,7 @@ import ren.natsuyuk1.comet.utils.time.yyMMddWithTimePattern
 data class PJSKEventPredictionInfo(
     val status: String,
     val data: JsonObject,
-    val message: String
+    val message: String,
 )
 
 fun PJSKEventPredictionInfo.toMessageWrapper(updateTime: Instant? = null): MessageWrapper =

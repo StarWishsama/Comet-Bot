@@ -18,7 +18,7 @@ object ErrorHelper {
         reason: String = "发生了一个错误",
         type: String,
         t: Throwable?,
-        message: String
+        message: String,
     ) {
         val fileName = "$type-${standardDateTimeFormatter.format(LocalDateTime.now())}.txt"
         val location = errorReportsFolder.resolve(fileName)

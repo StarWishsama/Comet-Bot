@@ -27,7 +27,7 @@ object GithubCommandService {
         user: CometUser,
         val owner: String,
         val name: String,
-        val groupID: Long
+        val groupID: Long,
     ) : Session(contact, user) {
         override suspend fun process(message: MessageWrapper) {
             val raw = message.encodeToString()
@@ -42,8 +42,8 @@ object GithubCommandService {
                     name,
                     owner,
                     secret,
-                    mutableListOf(GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber(groupID))
-                )
+                    mutableListOf(GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber(groupID)),
+                ),
             )
 
             contact.sendMessage("订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置 Comet 回调链接!".toMessageWrapper())
@@ -57,7 +57,7 @@ object GithubCommandService {
         sender: PlatformCommandSender,
         user: CometUser,
         groupID: Long,
-        repoName: String
+        repoName: String,
     ) {
         if (repoName.matches(repoRegex)) {
             val slice = repoName.split("/")
@@ -108,7 +108,7 @@ object GithubCommandService {
                                             "你正在订阅仓库 $owner/$name, 是否需要添加仓库密钥 (Secret)?\n" +
                                                 "添加密钥可以保证传输仓库信息更加安全, 但千万别忘记了你设置的密钥!\n" +
                                                 "如果无需添加, 请回复「完成订阅」, 反之直接发送你欲设置的密钥."
-                                            ).toMessageWrapper()
+                                            ).toMessageWrapper(),
                                     )
                                 }
 
@@ -125,7 +125,7 @@ object GithubCommandService {
                             """
                             订阅仓库 $owner/$name 成功, 请至仓库 WebHook 设置添加以下链接!
                             >> ${CometServerConfig.data.serverName}/github
-                            """.trimIndent().toMessageWrapper()
+                            """.trimIndent().toMessageWrapper(),
                         )
                     }
                 }
@@ -140,7 +140,7 @@ object GithubCommandService {
     suspend fun processUnsubscribe(
         subject: PlatformCommandSender,
         groupID: Long,
-        repoName: String
+        repoName: String,
     ) {
         if (repoName.matches(repoRegex)) {
             val slice = repoName.split("/")
@@ -203,7 +203,7 @@ object GithubCommandService {
                 buildMessageWrapper {
                     appendElement(Image(url = image))
                     appendText("🔗 https://github.com/$owner/$name")
-                }
+                },
             )
         }
     }
@@ -222,7 +222,7 @@ object GithubCommandService {
                     repos.forEach { r ->
                         append(r.getName() + ", ")
                     }
-                }.removeSuffix(", ").toMessageWrapper()
+                }.removeSuffix(", ").toMessageWrapper(),
             )
         }
     }
@@ -251,7 +251,7 @@ object GithubCommandService {
                         appendTextln("当前仓库 ${repo.getName()}")
                         appendTextln("订阅分支 >> ${subSetting.subscribeBranch}")
                         appendText("订阅事件 >> ${subSetting.subscribeEvent}")
-                    }
+                    },
                 )
             }
         }

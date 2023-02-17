@@ -43,7 +43,7 @@ class TestKeyWord {
                 SessionManager.handleSession(
                     group,
                     sender,
-                    buildMessageWrapper { appendText("TestMessageWrapper") }
+                    buildMessageWrapper { appendText("TestMessageWrapper") },
                 )
             }
 

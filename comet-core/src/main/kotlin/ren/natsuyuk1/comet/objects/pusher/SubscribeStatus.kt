@@ -4,5 +4,5 @@ enum class SubscribeStatus {
     SUCCESS,
     NOT_FOUND,
     SUBSCRIBED,
-    FAILED
+    FAILED,
 }

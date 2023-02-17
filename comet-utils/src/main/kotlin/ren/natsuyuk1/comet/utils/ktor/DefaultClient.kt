@@ -32,7 +32,7 @@ internal val defaultClient = HttpClient(CIO) {
                 prettyPrint = true
                 isLenient = true
                 ignoreUnknownKeys = true
-            }
+            },
         )
     }
 }

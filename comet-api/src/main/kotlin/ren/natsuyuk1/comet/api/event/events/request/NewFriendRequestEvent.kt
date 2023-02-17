@@ -10,7 +10,7 @@ abstract class NewFriendRequestEvent(
     val message: String,
     val fromId: Long,
     val fromGroupId: Long,
-    val fromNick: String
+    val fromNick: String,
 ) : CometEvent(comet) {
     suspend fun getFromGroup(): Group? = comet.getGroup(fromGroupId)
 

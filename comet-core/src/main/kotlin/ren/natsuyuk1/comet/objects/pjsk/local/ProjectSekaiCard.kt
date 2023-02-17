@@ -18,7 +18,7 @@ private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiCard : ProjectSekaiLocalFile(
     pjskFolder.resolve("cards.json"),
-    5.days
+    5.days,
 ) {
     private val cards = mutableListOf<PJSKCard>()
     private val url by lazy { getSekaiResourceURL("cards.json") }
@@ -32,8 +32,8 @@ object ProjectSekaiCard : ProjectSekaiLocalFile(
             cards.addAll(
                 json.decodeFromString(
                     ListSerializer(PJSKCard.serializer()),
-                    file.readTextBuffered()
-                )
+                    file.readTextBuffered(),
+                ),
             )
         } catch (e: Exception) {
             logger.warn(e) { "解析卡面数据时出现问题" }

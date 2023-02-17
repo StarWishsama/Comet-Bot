@@ -9,5 +9,5 @@ enum class MiraiLoginProtocol {
 
     IPAD,
 
-    MACOS
+    MACOS,
 }

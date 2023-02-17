@@ -18,7 +18,7 @@ val COIN = CommandProperty(
     "coin",
     listOf("yb", "硬币"),
     "操作用户硬币",
-    permissionLevel = UserLevel.OWNER
+    permissionLevel = UserLevel.OWNER,
 )
 
 class CoinCommand(
@@ -26,7 +26,7 @@ class CoinCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    val user: CometUser
+    val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, COIN) {
 
     private val target by option("-t", "--target", help = "目标用户").user(message)

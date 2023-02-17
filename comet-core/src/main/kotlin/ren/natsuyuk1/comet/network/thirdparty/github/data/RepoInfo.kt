@@ -19,13 +19,13 @@ data class RepoInfo(
     @SerialName("html_url")
     val url: String,
     @SerialName("description")
-    val description: String?
+    val description: String?,
 ) {
     @Serializable
     data class OwnerInfo(
         val login: String,
         val id: Int,
         @SerialName("html_url")
-        val pageUrl: String
+        val pageUrl: String,
     )
 }

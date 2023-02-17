@@ -24,7 +24,7 @@ val GITHUB = CommandProperty(
         "/github unsub [仓库名] 取消订阅仓库\n" +
         "/github info [仓库名/URL] 查询仓库信息\n" +
         "/github setting [仓库名] 修改仓库订阅事件\n" +
-        "/github list 查询已订阅的仓库"
+        "/github list 查询已订阅的仓库",
 )
 
 class GithubCommand(
@@ -32,7 +32,7 @@ class GithubCommand(
     override val sender: PlatformCommandSender,
     override val subject: PlatformCommandSender,
     val message: MessageWrapper,
-    val user: CometUser
+    val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, GITHUB) {
 
     init {
@@ -41,7 +41,7 @@ class GithubCommand(
             UnSubscribe(subject, sender, user),
             Info(subject, sender, user),
             Setting(message, subject, sender, user),
-            List(subject, sender, user)
+            List(subject, sender, user),
         )
     }
 
@@ -55,7 +55,7 @@ class GithubCommand(
     class Subscribe(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, SUBSCRIBE) {
         companion object {
             val SUBSCRIBE = SubCommandProperty("subscribe", listOf("sub", "订阅"), GITHUB, UserLevel.ADMIN)
@@ -83,7 +83,7 @@ class GithubCommand(
     class UnSubscribe(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, UNSUBSCRIBE) {
         companion object {
             val UNSUBSCRIBE = SubCommandProperty("unsubscribe", listOf("unsub", "订阅"), GITHUB, UserLevel.ADMIN)
@@ -111,7 +111,7 @@ class GithubCommand(
     class Info(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, INFO) {
         companion object {
             val INFO = SubCommandProperty("info", listOf("cx", "查询"), GITHUB)
@@ -132,7 +132,7 @@ class GithubCommand(
         val message: MessageWrapper,
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, SETTING) {
 
         private val add by option("-a", "--add").flag(default = false)
@@ -167,7 +167,7 @@ class GithubCommand(
 
                     val result = if (target == null) {
                         GitHubRepoData.Data.GithubRepo.GithubRepoSubscriber(
-                            actualGroupID
+                            actualGroupID,
                         ).also {
                             it.subscribeBranch.add(branch!!)
                             repo.subscribers.add(it)
@@ -232,7 +232,7 @@ class GithubCommand(
     class List(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, LIST) {
         companion object {
             val LIST = SubCommandProperty("list", listOf("ls", "列表"), GITHUB)

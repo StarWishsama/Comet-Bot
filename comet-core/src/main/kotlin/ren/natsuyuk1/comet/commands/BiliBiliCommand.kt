@@ -22,7 +22,7 @@ val BILIBILI = CommandProperty(
     /bili dynamic 查询用户动态
     /bili sub 订阅用户动态 (含开播信息) 
     /bili unsub 取消订阅用户动态
-    """.trimIndent()
+    """.trimIndent(),
 )
 
 class BiliBiliCommand(
@@ -30,13 +30,13 @@ class BiliBiliCommand(
     sender: PlatformCommandSender,
     subject: PlatformCommandSender,
     val message: MessageWrapper,
-    val user: CometUser
+    val user: CometUser,
 ) : CometCommand(comet, sender, subject, message, user, BILIBILI) {
     init {
         subcommands(
             User(subject, sender, user),
             Dynamic(subject, sender, user),
-            Video(subject, sender, user)
+            Video(subject, sender, user),
         )
     }
 
@@ -49,14 +49,14 @@ class BiliBiliCommand(
     class User(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, USER) {
 
         companion object {
             val USER = SubCommandProperty(
                 "user",
                 listOf("用户", "yh"),
-                BILIBILI
+                BILIBILI,
             )
         }
 
@@ -77,7 +77,7 @@ class BiliBiliCommand(
     class Video(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, VIDEO) {
 
         private val video by argument(help = "视频 av/bv号/链接")
@@ -86,7 +86,7 @@ class BiliBiliCommand(
             val VIDEO = SubCommandProperty(
                 "video",
                 listOf("视频", "vid", "sp"),
-                BILIBILI
+                BILIBILI,
             )
         }
 
@@ -102,14 +102,14 @@ class BiliBiliCommand(
     class Dynamic(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
-        override val user: CometUser
+        override val user: CometUser,
     ) : CometSubCommand(subject, sender, user, DYNAMIC) {
 
         companion object {
             val DYNAMIC = SubCommandProperty(
                 "dynamic",
                 listOf("动态", "dyna"),
-                BILIBILI
+                BILIBILI,
             )
         }
 

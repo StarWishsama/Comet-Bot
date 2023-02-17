@@ -22,13 +22,13 @@ internal val LOGIN = CommandProperty(
     "/login [ID] [密码]\n" +
         "-p/--platform (登录平台 默认为 QQ)\n" +
         "-P/--protocol 登录协议, 仅在使用 QQ 登录时可用\n" +
-        "注意: Telegram 平台下, 你的 ID 为 token 中的**数字**."
+        "注意: Telegram 平台下, 你的 ID 为 token 中的**数字**.",
 )
 
 internal class Login(
     override val sender: ConsoleCommandSender,
     message: MessageWrapper,
-    user: CometUser
+    user: CometUser,
 ) : BaseCommand(sender, message, user, LOGIN) {
 
     private val id by argument(name = "账户 ID", help = "登录账户的 ID").long()
@@ -38,13 +38,13 @@ internal class Login(
     private val platform by option(
         "-p",
         "--platform",
-        help = "登录 Comet 机器人的平台 (例如 QQ, Telegram)"
+        help = "登录 Comet 机器人的平台 (例如 QQ, Telegram)",
     ).enum<CometPlatform>(true).default(CometPlatform.MIRAI)
 
     private val protocol by option(
         "-P",
         "--protocol",
-        help = "登录 Comet QQ 侧时使用的协议"
+        help = "登录 Comet QQ 侧时使用的协议",
     ).enum<MiraiLoginProtocol>(true).default(MiraiLoginProtocol.ANDROID_PAD)
 
     override suspend fun run() {

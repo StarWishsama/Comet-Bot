@@ -71,7 +71,7 @@ object GitHubService {
         val parse: GitHubEventData =
             processEvent(
                 URLDecoder.decode(requestBody.replace("payload=", ""), Charsets.UTF_8),
-                eventType
+                eventType,
             ) ?: return SecretStatus.UNSUPPORTED_EVENT
 
         val targetRepo =
@@ -120,7 +120,7 @@ fun Comet.subscribeGitHubEvent() =
                             appendElement(Image(filePath = image.absPath))
                             appendLine()
                             appendText("🔗 ${event.eventData.url()}")
-                        }
+                        },
                     )
                 }
             } catch (e: FileNotFoundException) {

@@ -19,10 +19,10 @@ fun VideoInfo.toMessageWrapper(): MessageWrapper =
                 val coin = stat?.coin?.getBetterNumber()
                 val collect = stat?.collect?.getBetterNumber()
                 append(
-                    "| \uD83D\uDC4D $like \uD83D\uDCB0 $coin ⭐ $collect\n"
+                    "| \uD83D\uDC4D $like \uD83D\uDCB0 $coin ⭐ $collect\n",
                 )
                 append(if (stat?.highestRank?.let { it > 0 } == true) "| 本站最高日排行第${stat?.highestRank}名\n" else "\n")
-            }
+            },
         )
 
         appendElement(Image(url = buildImagePreview(cover)))

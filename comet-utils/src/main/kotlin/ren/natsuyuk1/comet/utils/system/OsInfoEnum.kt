@@ -4,11 +4,11 @@ enum class OsType {
     WINDOWS,
     LINUX,
     MACOS,
-    UNSUPPORTED
+    UNSUPPORTED,
 }
 
 enum class OsArch {
     X86_64,
     ARM64,
-    UNSUPPORTED
+    UNSUPPORTED,
 }

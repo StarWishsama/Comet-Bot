@@ -11,7 +11,7 @@ object CometServerConfig : PersistDataFile<CometServerConfig.Data>(
     Data.serializer(),
     Data(),
     Yaml(),
-    readOnly = true
+    readOnly = true,
 ) {
     @kotlinx.serialization.Serializable
     data class Data(
@@ -20,6 +20,6 @@ object CometServerConfig : PersistDataFile<CometServerConfig.Data>(
         @Comment("服务器端口")
         val port: Int = 1145,
         @Comment("服务器对外展示的域名, 在订阅时展示, 如 https://example.com")
-        val serverName: String = ""
+        val serverName: String = "",
     )
 }

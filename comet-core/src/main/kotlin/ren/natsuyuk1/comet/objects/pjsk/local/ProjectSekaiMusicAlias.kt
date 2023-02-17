@@ -22,7 +22,7 @@ private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiMusicAlias : ProjectSekaiLocalFile(
     pjskFolder.resolve("music_title.json"),
-    5.days
+    5.days,
 ) {
     private var musicAliasDatabase = mapOf<Int, Array<String>>()
 
@@ -35,7 +35,7 @@ object ProjectSekaiMusicAlias : ProjectSekaiLocalFile(
             } else {
                 musicAliasDatabase = json.decodeFromString(
                     MapSerializer(Int.serializer(), ArraySerializer(String.serializer())),
-                    content
+                    content,
                 )
             }
         } catch (e: Exception) {
@@ -56,7 +56,7 @@ object ProjectSekaiMusicAlias : ProjectSekaiLocalFile(
                 if (file.length() == 0L || commitTime > lastModified) {
                     if (cometClient.client.downloadFile(
                             getCometDatabaseURL(file.name),
-                            file
+                            file,
                         ) == DownloadStatus.OK
                     ) {
                         logger.info { "成功更新歌曲别名数据" }

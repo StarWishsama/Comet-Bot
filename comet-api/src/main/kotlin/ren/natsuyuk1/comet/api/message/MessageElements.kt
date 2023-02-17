@@ -102,7 +102,7 @@ fun ByteArray.asImage() = Image(byteArray = this)
 data class AtElement(
     val target: Long = 0,
     // For Telegram
-    val userName: String = ""
+    val userName: String = "",
 ) : WrapperElement() {
     override fun parseToString(): String = "@$target"
 }

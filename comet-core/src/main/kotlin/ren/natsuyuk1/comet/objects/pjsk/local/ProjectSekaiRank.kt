@@ -21,7 +21,8 @@ import kotlin.time.Duration.Companion.days
 private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiRank : ProjectSekaiLocalFile(
-    pjskFolder.resolve("rankMatchSeasons.json"), 30.days
+    pjskFolder.resolve("rankMatchSeasons.json"),
+    30.days,
 ) {
     internal val rankSeasonInfo = mutableListOf<PJSKRankSeasonInfo>()
 
@@ -31,8 +32,9 @@ object ProjectSekaiRank : ProjectSekaiLocalFile(
         try {
             rankSeasonInfo.addAll(
                 json.decodeFromString(
-                    ListSerializer(PJSKRankSeasonInfo.serializer()), file.readTextBuffered()
-                )
+                    ListSerializer(PJSKRankSeasonInfo.serializer()),
+                    file.readTextBuffered(),
+                ),
             )
         } catch (e: Exception) {
             logger.warn(e) { "解析排位数据时出现问题" }
@@ -51,7 +53,8 @@ object ProjectSekaiRank : ProjectSekaiLocalFile(
             if (!file.exists() || lastUpdate > current) {
                 file.touch()
                 if (cometClient.client.downloadFile(
-                        getSekaiBestResourceURL(file.name), file
+                        getSekaiBestResourceURL(file.name),
+                        file,
                     ) == DownloadStatus.OK
                 ) {
                     logger.info { "成功更新排位数据" }

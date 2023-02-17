@@ -15,7 +15,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 abstract class MapTable<TID : Comparable<TID>, K, V>(
-    tableName: String
+    tableName: String,
 ) : IdTable<TID>(tableName) {
 
     abstract val key: Column<K>
@@ -24,7 +24,7 @@ abstract class MapTable<TID : Comparable<TID>, K, V>(
 
 abstract class CacheableData<TID : Comparable<TID>>(
     protected val id: EntityID<TID>,
-    private val table: IdTable<TID>
+    private val table: IdTable<TID>,
 ) {
 
     private var cache: Query = originalData
@@ -46,7 +46,7 @@ abstract class CacheableData<TID : Comparable<TID>>(
 
 class SQLDatabaseMap<TID : Comparable<TID>, K, V>(
     id: EntityID<TID>,
-    private val mapTable: MapTable<TID, K, V>
+    private val mapTable: MapTable<TID, K, V>,
 ) : CacheableData<TID>(id, mapTable), MutableMap<K, V> {
 
     override val size: Int
@@ -60,7 +60,7 @@ class SQLDatabaseMap<TID : Comparable<TID>, K, V>(
 
     inner class Entry(
         override val key: K,
-        override val value: V
+        override val value: V,
     ) : MutableMap.MutableEntry<K, V> {
 
         override fun setValue(newValue: V): V {

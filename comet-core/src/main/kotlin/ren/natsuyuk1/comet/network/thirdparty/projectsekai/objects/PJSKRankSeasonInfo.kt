@@ -13,5 +13,5 @@ data class PJSKRankSeasonInfo(
     val distributionStartAt: Long,
     val distributionEndAt: Long,
     val closedAt: Long,
-    val isDisplayResult: Boolean
+    val isDisplayResult: Boolean,
 )

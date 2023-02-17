@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ArcaeaSongInfo(
     @SerialName("data")
-    val songResult: List<ArcaeaSongResult>
+    val songResult: List<ArcaeaSongResult>,
 ) {
     @Serializable
     data class ArcaeaSongResult(

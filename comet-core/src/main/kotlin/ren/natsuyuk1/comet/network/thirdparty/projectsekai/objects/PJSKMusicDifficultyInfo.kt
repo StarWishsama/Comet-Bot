@@ -16,5 +16,5 @@ data class PJSKMusicDifficultyInfo(
     val totalNoteCount: Int,
     val playLevelAdjust: Double = 0.0,
     val fullComboAdjust: Double = 0.0,
-    val fullPerfectAdjust: Double = 0.0
+    val fullPerfectAdjust: Double = 0.0,
 )
