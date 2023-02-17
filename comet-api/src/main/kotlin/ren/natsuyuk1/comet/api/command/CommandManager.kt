@@ -59,7 +59,7 @@ object CommandManager {
     fun registerCommand(
         entry: CommandProperty,
         subCommandProperty: List<SubCommandProperty> = listOf(),
-        handler: (Comet, PlatformCommandSender, PlatformCommandSender, MessageWrapper, CometUser) -> BaseCommand
+        handler: (Comet, PlatformCommandSender, PlatformCommandSender, MessageWrapper, CometUser) -> BaseCommand,
     ) {
         registerCommand(CommandNode(entry, subCommandProperty, handler))
     }
@@ -101,7 +101,7 @@ object CommandManager {
         sender: CommandSender,
         subject: CommandSender,
         wrapper: MessageWrapper,
-        tempPermission: Pair<UserLevel, String>? = null
+        tempPermission: Pair<UserLevel, String>? = null,
     ): Job = commandScope.launch {
         val executeTime = Clock.System.now()
 
@@ -117,7 +117,8 @@ object CommandManager {
 
         // 检查消息是否含命令前缀
         if (sender !is ConsoleCommandSender && !args[0].containsEtc(
-                false, *CometGlobalConfig.data.commandPrefix.toTypedArray()
+                false,
+                *CometGlobalConfig.data.commandPrefix.toTypedArray(),
             )
         ) {
             return@launch
@@ -194,7 +195,11 @@ object CommandManager {
                     .main(args.drop(1))
             } else {
                 (command as ConsoleCommandNode).handler(
-                    comet, sender as ConsoleCommandSender, subject as ConsoleCommandSender, wrapper, user
+                    comet,
+                    sender as ConsoleCommandSender,
+                    subject as ConsoleCommandSender,
+                    wrapper,
+                    user,
                 ).main(args.drop(1))
             }
 
@@ -218,7 +223,7 @@ object CommandManager {
                 logger.info {
                     "命令 ${command.property.name} 执行状态 ${it.name}, 耗时 ${
                     executeTime.getLastingTimeAsString(
-                        TimeUnit.MILLISECONDS
+                        TimeUnit.MILLISECONDS,
                     )
                     }"
                 }
@@ -230,11 +235,11 @@ object CommandManager {
                         appendText(
                             "在尝试执行命令时发生异常, 报错信息如下, 详细请查看后台\n" + it::class.jvmName + ":" + (
                                 it.message?.limit( // ktlint-disable max-line-length
-                                    30
+                                    30,
                                 ) ?: "无"
-                                )
+                                ),
                         )
-                    }
+                    },
                 )
             } else {
                 subject.sendMessage(buildMessageWrapper { appendText("这条命令突然坏掉了 (っ °Д °;)っ") })
@@ -261,16 +266,22 @@ object CommandManager {
     fun getCommand(name: String, sender: CommandSender): AbstractCommandNode<*>? {
         return when (sender) {
             is ConsoleCommandSender -> {
-                if (commands[name] is ConsoleCommandNode) commands[name]
-                else commands.values.find {
-                    it is ConsoleCommandNode && it.property.alias.contains(name)
+                if (commands[name] is ConsoleCommandNode) {
+                    commands[name]
+                } else {
+                    commands.values.find {
+                        it is ConsoleCommandNode && it.property.alias.contains(name)
+                    }
                 }
             }
 
             is PlatformCommandSender -> {
-                if (commands[name] is CommandNode) commands[name]
-                else commands.values.find {
-                    it is CommandNode && it.property.alias.contains(name)
+                if (commands[name] is CommandNode) {
+                    commands[name]
+                } else {
+                    commands.values.find {
+                        it is CommandNode && it.property.alias.contains(name)
+                    }
                 }
             }
         }
