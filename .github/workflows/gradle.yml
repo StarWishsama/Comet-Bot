@@ -52,14 +52,14 @@ jobs:
             })    
 
       - uses: actions/upload-artifact@v3
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref_name == 'dev'
         with:
           name: Comet-Bot-full
           path: comet
 
       - name: 自动发布测试版本
         uses: marvinpinto/action-automatic-releases@v1.2.1
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref_name == 'dev'
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "testing"
