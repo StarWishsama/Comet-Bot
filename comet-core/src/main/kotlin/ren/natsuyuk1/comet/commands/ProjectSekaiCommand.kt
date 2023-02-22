@@ -124,7 +124,7 @@ class ProjectSekaiCommand(
             val top100 = cometClient.getCurrentEventTop100()
 
             when {
-                top100.any { it.userId == userData?.userID } && position == 0 -> {
+                top100.rankings.any { it.userId == userData?.userID } && position == 0 -> {
                     if (SkikoHelper.isSkikoLoaded()) {
                         subject.sendMessage(ProjectSekaiImageService.drawEventInfo(userData, 0, top100))
                     } else {

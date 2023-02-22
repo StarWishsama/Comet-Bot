@@ -98,7 +98,7 @@ object ProjectSekaiAPI {
         return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
     }
 
-    suspend fun CometClient.getCurrentEventTop100(): List<ProjectSekaiEventInfo> {
+    suspend fun CometClient.getCurrentEventTop100(): ProjectSekaiEventInfo {
         logger.debug { "Fetching project sekai event top 100" }
 
         val eventId = ProjectSekaiData.getEventId()
