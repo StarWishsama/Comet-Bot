@@ -66,16 +66,17 @@ object ProjectSekaiImageService {
     suspend fun drawEventInfo(
         userData: ProjectSekaiUserData?,
         position: Int,
-        top100: List<ProjectSekaiEventInfo>,
+        eventInfo: ProjectSekaiEventInfo,
     ): MessageWrapper {
         val now = Clock.System.now()
+        val top100 = eventInfo.rankings
         val index = top100.indexOfFirst { it.userId == userData?.userID || it.rank == position }
         val profile = top100[index]
         val eventInfo = ProjectSekaiData.getCurrentEventInfo() ?: return "查询失败, 活动信息未加载".toMessageWrapper()
         val eventStatus = ProjectSekaiManager.getCurrentEventStatus()
 
-        var aheadEventStatus: ProjectSekaiEventInfo? = null
-        var behindEventStatus: ProjectSekaiEventInfo? = null
+        var aheadEventStatus: ProjectSekaiEventInfo.UserEventInfo? = null
+        var behindEventStatus: ProjectSekaiEventInfo.UserEventInfo? = null
 
         if (index > 0) {
             aheadEventStatus = top100[index - 1]

@@ -32,19 +32,19 @@ import ren.natsuyuk1.comet.utils.time.yyMMddWithTimeZonePattern
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
-internal fun List<ProjectSekaiEventInfo>.toMessageWrapper(
+internal fun ProjectSekaiEventInfo.toMessageWrapper(
     userData: ProjectSekaiUserData?,
     position: Int,
 ): MessageWrapper {
-    val top100 = this
+    val top100 = rankings
     val now = Clock.System.now()
     val index = top100.indexOfFirst { it.userId == userData?.userID || it.rank == position }
     val profile = top100[index]
     val eventInfo = ProjectSekaiData.getCurrentEventInfo() ?: return "查询失败, 活动信息未加载".toMessageWrapper()
     val eventStatus = ProjectSekaiManager.getCurrentEventStatus()
 
-    var aheadEventStatus: ProjectSekaiEventInfo? = null
-    var behindEventStatus: ProjectSekaiEventInfo? = null
+    var aheadEventStatus: ProjectSekaiEventInfo.UserEventInfo? = null
+    var behindEventStatus: ProjectSekaiEventInfo.UserEventInfo? = null
 
     if (index > 0) {
         aheadEventStatus = top100[index - 1]
