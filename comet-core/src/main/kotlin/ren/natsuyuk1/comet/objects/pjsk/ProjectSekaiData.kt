@@ -9,10 +9,6 @@
 
 package ren.natsuyuk1.comet.objects.pjsk
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import mu.KotlinLogging
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
@@ -22,18 +18,13 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import ren.natsuyuk1.comet.consts.cometClient
-import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getRankPredictionInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.PJSKEventPredictionInfo
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiEvent
 import java.util.*
-import kotlin.time.Duration.Companion.hours
 
 private val logger = KotlinLogging.logger {}
 
@@ -44,8 +35,6 @@ object ProjectSekaiDataTable : IdTable<Int>("pjsk_data") {
     val aggregateTime: Column<Long> = long("aggregate_at")
     val endTime: Column<Long> = long("end_time")
     val name = text("name")
-    val eventPredictionData = text("event_prediction_data")
-    val eventPredictionUpdateTime = timestamp("event_prediction_update_time")
     val eventType = text("event_type").default("marathon")
 }
 
@@ -53,8 +42,8 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
     companion object : EntityClass<Int, ProjectSekaiData>(ProjectSekaiDataTable) {
         private suspend fun initData() {
             kotlin.runCatching {
-                Pair(cometClient.getEventList(1).data.first(), cometClient.getRankPredictionInfo())
-            }.onSuccess { (eventInfo, pred) ->
+                cometClient.getEventList(1).data.first()
+            }.onSuccess { eventInfo ->
                 transaction {
                     new(0) {
                         currentEventID = eventInfo.id
@@ -62,8 +51,6 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
                         aggregateTime = eventInfo.aggregateAt
                         endTime = eventInfo.closedAt
                         name = eventInfo.name
-                        eventPredictionData = json.encodeToString(pred)
-                        eventPredictionUpdateTime = Clock.System.now()
                         eventType = eventInfo.eventType
                     }
                 }
@@ -115,52 +102,9 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
             }
         }
 
-        suspend fun updatePredictionData() {
-            var init = false
-            newSuspendedTransaction {
-                if (ProjectSekaiData.all().empty()) {
-                    initData()
-                    init = true
-                }
-            }
-
-            if (init) return
-
-            val pjskData = transaction { ProjectSekaiData.all().first() }
-
-            val now = Clock.System.now()
-
-            if ((now - pjskData.eventPredictionUpdateTime) >= 2.hours) {
-                kotlin.runCatching {
-                    cometClient.getRankPredictionInfo()
-                }.onSuccess { pred ->
-                    transaction {
-                        pjskData.apply {
-                            eventPredictionData = json.encodeToString(pred)
-                            eventPredictionUpdateTime = now
-                        }
-                    }
-                }.onFailure {
-                    logger.warn(it) { "获取 Project Sekai 活动积分预测信息失败, 可能是上游服务器异常" }
-                }
-            }
-        }
-
         fun getCurrentEventInfo(): ProjectSekaiData? = transaction { ProjectSekaiData.all().firstOrNull() }
 
         fun getEventId(): Int? = transaction { ProjectSekaiData.all().firstOrNull()?.currentEventID }
-
-        fun getCurrentPredictionInfo(): PJSKEventPredictionInfo? =
-            transaction {
-                getCurrentEventInfo()?.eventPredictionData?.let {
-                    json.decodeFromString(it)
-                }
-            }
-
-        fun getPredictionInfoTime(): Instant? =
-            transaction {
-                getCurrentEventInfo()?.eventPredictionUpdateTime
-            }
     }
 
     var currentEventID by ProjectSekaiDataTable.currentEventID
@@ -168,8 +112,6 @@ class ProjectSekaiData(id: EntityID<Int>) : Entity<Int>(id) {
     var aggregateTime by ProjectSekaiDataTable.aggregateTime
     var endTime by ProjectSekaiDataTable.endTime
     var name by ProjectSekaiDataTable.name
-    var eventPredictionData by ProjectSekaiDataTable.eventPredictionData
-    var eventPredictionUpdateTime by ProjectSekaiDataTable.eventPredictionUpdateTime
     var eventType by ProjectSekaiDataTable.eventType
 }
 
@@ -224,6 +166,10 @@ class ProjectSekaiUserData(id: EntityID<UUID>) : UUIDEntity(id) {
 
         fun getUserPJSKData(uuid: UUID) = transaction {
             find { ProjectSekaiUserDataTable.id eq uuid }.firstOrNull()
+        }
+
+        fun hasUserID(userID: Long) = transaction {
+            !find { ProjectSekaiUserDataTable.userID eq userID }.empty()
         }
     }
 }

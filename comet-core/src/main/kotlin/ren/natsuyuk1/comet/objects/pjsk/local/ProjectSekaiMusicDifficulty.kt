@@ -1,12 +1,16 @@
 package ren.natsuyuk1.comet.objects.pjsk.local
 
-import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.datetime.Instant
+import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
+import ren.natsuyuk1.comet.network.thirdparty.github.GitHubApi
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.PJSKMusicDifficultyInfo
+import ren.natsuyuk1.comet.util.pjsk.getSekaiBestResourceURL
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
-import ren.natsuyuk1.comet.utils.file.isBlank
+import ren.natsuyuk1.comet.utils.file.lastModifiedTime
 import ren.natsuyuk1.comet.utils.file.readTextBuffered
 import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
@@ -17,42 +21,51 @@ private val logger = KotlinLogging.logger {}
 
 object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
     pjskFolder.resolve("musicDifficulties.json"),
-    1.days,
+    5.days,
 ) {
-    internal val musicDiffDatabase = mutableListOf<PJSKMusicDifficultyInfo>()
+    private val musicDifficulties = mutableListOf<PJSKMusicDifficultyInfo>()
 
     override suspend fun load() {
-        musicDiffDatabase.clear()
-
         try {
-            musicDiffDatabase.addAll(
-                json.decodeFromString(
-                    ListSerializer(PJSKMusicDifficultyInfo.serializer()),
-                    file.readTextBuffered(),
-                ),
-            )
+            val content = file.readTextBuffered()
+            if (content.isBlank()) {
+                logger.warn { "加载 Project Sekai 歌曲数据失败, 文件为空" }
+            } else {
+                musicDifficulties.clear()
+                musicDifficulties.addAll(json.decodeFromString(content))
+            }
         } catch (e: Exception) {
-            logger.warn(e) { "解析 Project Sekai 音乐等级偏差值数据时出现问题" }
+            logger.warn(e) { "解析歌曲别名数据时出现问题" }
         }
     }
 
     override suspend fun update(): Boolean {
         file.touch()
 
-        if (file.isBlank() || isOutdated()) {
-            if (cometClient.client.downloadFile(
-                    "https://gitlab.com/pjsekai/database/musics/-/raw/main/musicDifficulties.json",
-                    file,
-                ) == DownloadStatus.OK
-            ) {
-                logger.info { "成功更新音乐等级偏差值数据" }
+        GitHubApi.getSpecificFileCommits("StarWishsama", "comet-resource-database", "projectsekai/music_title.json")
+            .onSuccess {
+                val commitTime = Instant.parse(it.first().commit.committer.date)
+                val lastModified = file.lastModifiedTime()
 
-                return true
+                file.touch()
+
+                if (file.length() == 0L || commitTime > lastModified) {
+                    if (cometClient.client.downloadFile(
+                            getSekaiBestResourceURL(file.name),
+                            file,
+                        ) == DownloadStatus.OK
+                    ) {
+                        logger.info { "成功更新歌曲别名数据" }
+                        return true
+                    }
+                }
+            }.onFailure {
+                logger.warn(it) { "加载 Project Sekai 歌曲难度失败!" }
             }
-        }
 
         return false
     }
 
-    fun getMusicDifficulty(musicId: Int) = musicDiffDatabase.filter { it.musicId == musicId }
+    fun getDifficulty(musicId: Int, difficulty: MusicDifficulty) =
+        musicDifficulties.find { it.id == musicId && it.musicDifficulty == difficulty }
 }

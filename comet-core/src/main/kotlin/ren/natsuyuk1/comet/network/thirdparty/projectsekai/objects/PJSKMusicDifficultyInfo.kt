@@ -3,9 +3,7 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects
 import kotlinx.serialization.Serializable
 
 /**
- * Project Sekai Profile Music Data
- *
- * 有删减
+ * Project Sekai Music Data
  */
 @Serializable
 data class PJSKMusicDifficultyInfo(
@@ -14,7 +12,4 @@ data class PJSKMusicDifficultyInfo(
     val musicDifficulty: MusicDifficulty,
     val playLevel: Int,
     val totalNoteCount: Int,
-    val playLevelAdjust: Double = 0.0,
-    val fullComboAdjust: Double = 0.0,
-    val fullPerfectAdjust: Double = 0.0,
 )

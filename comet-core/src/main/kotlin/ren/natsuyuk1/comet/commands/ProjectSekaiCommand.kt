@@ -3,9 +3,7 @@ package ren.natsuyuk1.comet.commands
 import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
-import moe.sdl.yac.parameters.options.flag
 import moe.sdl.yac.parameters.options.option
-import moe.sdl.yac.parameters.types.int
 import moe.sdl.yac.parameters.types.long
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
@@ -14,21 +12,16 @@ import ren.natsuyuk1.comet.api.message.asImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
-import ren.natsuyuk1.comet.consts.cometClient
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCheerPredictData
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
-import ren.natsuyuk1.comet.objects.pjsk.local.PJSKProfileMusic
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.file.isBlank
 import ren.natsuyuk1.comet.utils.file.isType
-import ren.natsuyuk1.comet.utils.math.NumberUtil.formatDigests
 import java.io.File
 
 val PROJECTSEKAI by lazy {
@@ -37,7 +30,6 @@ val PROJECTSEKAI by lazy {
         listOf("pjsk", "啤酒烧烤"),
         "查询 Project Sekai: Colorful Stage 相关信息",
         " /pjsk bind -i [账号 ID] - 绑定账号\n" +
-            "/pjsk event (排名) 查询当前活动信息\n" +
             "/pjsk pred 查询当前活动结束预测分数\n" +
             "/pjsk info 查询账号信息\n" +
             "/pjsk chart 查询歌曲谱面\n" +
@@ -57,10 +49,7 @@ class ProjectSekaiCommand(
         if (FeatureConfig.data.projectSekaiSetting.enable) {
             subcommands(
                 Bind(subject, sender, user),
-                Event(subject, sender, user),
-                Prediction(subject, sender, user),
                 Info(subject, sender, user),
-                Best30(subject, sender, user),
                 Chart(subject, sender, user),
                 Music(subject, sender, user),
             )
@@ -74,11 +63,7 @@ class ProjectSekaiCommand(
         }
 
         if (currentContext.invokedSubcommand == null) {
-            if (ProjectSekaiUserData.isBound(user.id.value)) {
-                subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, 0))
-            } else {
-                subject.sendMessage(property.helpText.toMessageWrapper())
-            }
+            subject.sendMessage(property.helpText.toMessageWrapper())
         }
     }
 
@@ -144,75 +129,6 @@ class ProjectSekaiCommand(
         }
     }
 
-    class Event(
-        override val subject: PlatformCommandSender,
-        override val sender: PlatformCommandSender,
-        override val user: CometUser,
-    ) : CometSubCommand(subject, sender, user, EVENT) {
-
-        companion object {
-            val EVENT = SubCommandProperty(
-                "event",
-                listOf("活动排名", "活排"),
-                PROJECTSEKAI,
-            )
-        }
-
-        private val position by argument("排名位置", "欲查询的指定排名").int().default(0)
-
-        override suspend fun run() {
-            subject.sendMessage(ProjectSekaiService.queryUserEventInfo(user, position))
-        }
-    }
-
-    class Prediction(
-        override val subject: PlatformCommandSender,
-        override val sender: PlatformCommandSender,
-        override val user: CometUser,
-    ) : CometSubCommand(subject, sender, user, PREDICTION) {
-
-        companion object {
-            val PREDICTION = SubCommandProperty(
-                "pred",
-                listOf("prediction", "预测", "预测线"),
-                PROJECTSEKAI,
-            )
-        }
-
-        private val event by option("-e", "--event").flag(default = false)
-
-        override suspend fun run() {
-            if (event) {
-                cometClient.getCheerPredictData().toMessageWrapper().takeIf {
-                    !it.isEmpty()
-                }?.let {
-                    subject.sendMessage(it)
-                }
-            } else {
-                subject.sendMessage(ProjectSekaiService.fetchPrediction())
-            }
-        }
-    }
-
-    class Best30(
-        override val subject: PlatformCommandSender,
-        override val sender: PlatformCommandSender,
-        override val user: CometUser,
-    ) : CometSubCommand(subject, sender, user, BEST30) {
-
-        companion object {
-            val BEST30 = SubCommandProperty(
-                "best30",
-                listOf("b30"),
-                PROJECTSEKAI,
-            )
-        }
-
-        override suspend fun run() {
-            subject.sendMessage(ProjectSekaiService.b30(user))
-        }
-    }
-
     class Chart(
         override val subject: PlatformCommandSender,
         override val sender: PlatformCommandSender,
@@ -249,8 +165,6 @@ class ProjectSekaiCommand(
                 FeatureConfig.data.projectSekaiSetting.minSimilarity,
             )
 
-            val extraInfo = musicInfo?.id?.let { PJSKProfileMusic.getMusicInfo(it) }
-
             if (musicInfo == null) {
                 subject.sendMessage("找不到你想要搜索的歌曲哦".toMessageWrapper())
                 return
@@ -273,18 +187,6 @@ class ProjectSekaiCommand(
                 subject.sendMessage(
                     buildMessageWrapper {
                         appendTextln("搜索准确度: $sim")
-                        if (extraInfo != null) {
-                            val bpmText = if (!extraInfo.bpms.isNullOrEmpty()) {
-                                buildString {
-                                    extraInfo.bpms.forEach { bi ->
-                                        append("${bi.bpm.formatDigests(0)} - ")
-                                    }
-                                }.removeSuffix(" - ")
-                            } else {
-                                extraInfo.bpm.formatDigests(0)
-                            }
-                            appendTextln("BPM: $bpmText")
-                        }
                         appendElement(chartFile.asImage())
                     },
                 )

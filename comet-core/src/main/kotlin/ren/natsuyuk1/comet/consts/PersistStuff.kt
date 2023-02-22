@@ -63,8 +63,6 @@ val defaultCommands: List<AbstractCommandNode<*>> =
             PROJECTSEKAI,
             listOf(
                 ProjectSekaiCommand.Bind.BIND,
-                ProjectSekaiCommand.Event.EVENT,
-                ProjectSekaiCommand.Prediction.PREDICTION,
                 ProjectSekaiCommand.Info.INFO,
                 ProjectSekaiCommand.Chart.CHART,
                 ProjectSekaiCommand.Music.MUSIC,

@@ -20,9 +20,6 @@ import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiProfileEventInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.PJSKCheerfulPreditionInfo
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.PJSKEventPredictionInfo
 import ren.natsuyuk1.comet.utils.json.serializeTo
 
 private val logger = mu.KotlinLogging.logger {}
@@ -47,12 +44,6 @@ object ProjectSekaiAPI {
      * 同样有很奇怪的请求参数, 请多加留意
      */
     private const val PJSEKAI_URL = "https://api.pjsek.ai/database/master"
-
-    /**
-     * 33 Kit
-     * https://3-3.dev/
-     */
-    private const val THREE3KIT_URL = "https://33.dsml.hk/pred"
 
     private suspend fun CometClient.profileRequest(
         param: String,
@@ -79,34 +70,6 @@ object ProjectSekaiAPI {
         }
     }
 
-    suspend fun CometClient.getUserEventInfo(eventID: Int, userID: Long): SekaiProfileEventInfo {
-        logger.debug { "Fetching project sekai event $eventID rank for user $userID" }
-
-        val resp = profileRequest("/api/user/%7Buser_id%7D/event/$eventID/ranking") {
-            parameters.append("targetUserId", userID.toString())
-        }
-
-        if (resp.status != HttpStatusCode.OK) {
-            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
-        }
-
-        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
-    }
-
-    suspend fun CometClient.getSpecificRankInfo(eventID: Int, rankPosition: Int): SekaiProfileEventInfo {
-        logger.debug { "Fetching project sekai event $eventID rank position at $rankPosition" }
-
-        val resp = profileRequest("/api/user/%7Buser_id%7D/event/$eventID/ranking") {
-            parameters.append("targetRank", rankPosition.toString())
-        }
-
-        if (resp.status != HttpStatusCode.OK) {
-            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
-        }
-
-        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
-    }
-
     suspend fun CometClient.getEventList(limit: Int = 12, startAt: Int = -1, skip: Int = 0): ProjectSekaiEventList {
         logger.debug { "Fetching project sekai event list" }
 
@@ -119,12 +82,6 @@ object ProjectSekaiAPI {
                 }
             }
         }.bodyAsText().serializeTo(json)
-    }
-
-    suspend fun CometClient.getRankPredictionInfo(): PJSKEventPredictionInfo {
-        logger.debug { "Fetching project sekai rank prediction info" }
-
-        return client.get(THREE3KIT_URL).bodyAsText().serializeTo(json)
     }
 
     suspend fun CometClient.getUserInfo(id: Long): ProjectSekaiUserInfo {
@@ -145,18 +102,6 @@ object ProjectSekaiAPI {
         val resp = profileRequest("/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
             parameters.append("targetUserId", userId.toString())
         }
-
-        if (resp.status != HttpStatusCode.OK) {
-            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
-        }
-
-        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
-    }
-
-    suspend fun CometClient.getCheerPredictData(): PJSKCheerfulPreditionInfo {
-        logger.debug { "Fetching project sekai cheerful event predict info" }
-
-        val resp = client.get("https://33.dsml.hk/cheer-pred")
 
         if (resp.status != HttpStatusCode.OK) {
             error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")

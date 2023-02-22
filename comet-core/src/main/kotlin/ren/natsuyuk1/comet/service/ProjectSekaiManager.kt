@@ -5,12 +5,8 @@ import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import ren.natsuyuk1.comet.api.task.TaskManager
 import ren.natsuyuk1.comet.consts.cometClient
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
-import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicPlayResult
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusicDifficulty.musicDiffDatabase
-import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiRank.rankSeasonInfo
 import ren.natsuyuk1.comet.objects.pjsk.local.pjskLocal
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.coroutine.ModuleScope
@@ -18,8 +14,6 @@ import ren.natsuyuk1.comet.utils.file.touch
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
 import java.io.File
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 private val logger = KotlinLogging.logger {}
 
@@ -36,17 +30,11 @@ object ProjectSekaiManager {
         loadPJSKDatabase()
 
         scope.launch { refreshEvent() }
-        scope.launch { refreshCache() }
         scope.launch { loadBest30Image() }
 
         TaskManager.registerTask("pjsk_event", "0 6 * * *", ::refreshEvent)
-        TaskManager.registerTaskDelayed(3.toDuration(DurationUnit.HOURS), ::refreshCache)
 
         logger.info { "Project Sekai 管理器加载完成" }
-    }
-
-    private suspend fun refreshCache() {
-        ProjectSekaiData.updatePredictionData()
     }
 
     private suspend fun refreshEvent() {
@@ -96,26 +84,6 @@ object ProjectSekaiManager {
             }
         }
     }
-
-    fun getSongLevel(songId: Int, difficulty: MusicDifficulty): Int? {
-        val diffInfo =
-            musicDiffDatabase.find { it.musicId == songId && it.musicDifficulty == difficulty } ?: return null
-
-        return diffInfo.playLevel
-    }
-
-    fun getSongAdjustedLevel(songId: Int, difficulty: MusicDifficulty, playResult: MusicPlayResult): Double? {
-        val diffInfo =
-            musicDiffDatabase.find { it.musicId == songId && it.musicDifficulty == difficulty } ?: return null
-
-        return diffInfo.playLevel + when (playResult) {
-            MusicPlayResult.CLEAR -> diffInfo.playLevelAdjust
-            MusicPlayResult.FULL_COMBO -> diffInfo.fullComboAdjust
-            MusicPlayResult.ALL_PERFECT -> diffInfo.fullPerfectAdjust
-        }
-    }
-
-    fun getLatestRankSeason(): Int? = rankSeasonInfo.lastOrNull()?.id
 
     private suspend fun downloadCardImage(assetBundleName: String, trainingStatus: String) {
         val suffix = if (trainingStatus == "done") "after_training" else "normal"
