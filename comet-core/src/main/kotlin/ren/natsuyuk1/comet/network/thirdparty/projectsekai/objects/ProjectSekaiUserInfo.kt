@@ -86,11 +86,8 @@ data class ProjectSekaiUserInfo(
 
     @Serializable
     data class UserHonor(
-        val bondsHonorViewType: String,
-        val bondsHonorWordId: Int,
         val honorId: Int,
-        val honorLevel: Int,
-        val profileHonorType: String,
+        val level: Int,
     )
 }
 
