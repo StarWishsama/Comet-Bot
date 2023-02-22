@@ -17,9 +17,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.json.serializeTo
 
 private val logger = mu.KotlinLogging.logger {}
@@ -88,6 +90,20 @@ object ProjectSekaiAPI {
         logger.debug { "Fetching project sekai user info for $id" }
 
         val resp = profileRequest("/api/user/$id/profile")
+
+        if (resp.status != HttpStatusCode.OK) {
+            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
+        }
+
+        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
+    }
+
+    suspend fun CometClient.getCurrentEventTop100(): List<ProjectSekaiEventInfo> {
+        logger.debug { "Fetching project sekai event top 100" }
+
+        val eventId = ProjectSekaiData.getEventId()
+
+        val resp = profileRequest("/api/user/{user_id}/event/$eventId/ranking?rankingViewType=top100")
 
         if (resp.status != HttpStatusCode.OK) {
             error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")

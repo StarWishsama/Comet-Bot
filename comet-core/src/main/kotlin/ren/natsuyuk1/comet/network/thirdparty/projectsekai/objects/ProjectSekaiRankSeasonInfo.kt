@@ -14,7 +14,7 @@ data class ProjectSekaiRankSeasonInfo(
         val score: Int,
         val rank: Int,
         val name: String,
-        val userCard: SekaiProfileEventInfo.EventInfo.UserCard,
+        val userCard: ProjectSekaiUserInfo.UserCard,
         val userProfile: ProjectSekaiUserInfo.UserProfile,
         val userRankMatchSeason: SeasonInfo,
     ) {

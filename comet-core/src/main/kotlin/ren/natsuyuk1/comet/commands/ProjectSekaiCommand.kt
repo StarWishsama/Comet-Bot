@@ -4,6 +4,7 @@ import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
 import moe.sdl.yac.parameters.options.option
+import moe.sdl.yac.parameters.types.int
 import moe.sdl.yac.parameters.types.long
 import ren.natsuyuk1.comet.api.Comet
 import ren.natsuyuk1.comet.api.command.*
@@ -12,6 +13,8 @@ import ren.natsuyuk1.comet.api.message.asImage
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
+import ren.natsuyuk1.comet.consts.cometClient
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCurrentEventTop100
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
@@ -22,6 +25,7 @@ import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.util.toMessageWrapper
 import ren.natsuyuk1.comet.utils.file.isBlank
 import ren.natsuyuk1.comet.utils.file.isType
+import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import java.io.File
 
 val PROJECTSEKAI by lazy {
@@ -30,6 +34,7 @@ val PROJECTSEKAI by lazy {
         listOf("pjsk", "啤酒烧烤"),
         "查询 Project Sekai: Colorful Stage 相关信息",
         " /pjsk bind -i [账号 ID] - 绑定账号\n" +
+            "/pjsk event [排名位置 (限 TOP100)]\n" +
             "/pjsk pred 查询当前活动结束预测分数\n" +
             "/pjsk info 查询账号信息\n" +
             "/pjsk chart 查询歌曲谱面\n" +
@@ -49,6 +54,7 @@ class ProjectSekaiCommand(
         if (FeatureConfig.data.projectSekaiSetting.enable) {
             subcommands(
                 Bind(subject, sender, user),
+                Event(subject, sender, user),
                 Info(subject, sender, user),
                 Chart(subject, sender, user),
                 Music(subject, sender, user),
@@ -94,6 +100,50 @@ class ProjectSekaiCommand(
             }
 
             subject.sendMessage(ProjectSekaiService.bindAccount(user, userID!!))
+        }
+    }
+
+    class Event(
+        override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
+        override val user: CometUser,
+    ) : CometSubCommand(subject, sender, user, EVENT) {
+
+        companion object {
+            val EVENT = SubCommandProperty(
+                "event",
+                listOf("活动排名", "活排"),
+                PROJECTSEKAI,
+            )
+        }
+
+        private val position by argument("排名位置", "欲查询的指定排名").int().default(0)
+
+        override suspend fun run() {
+            val userData = ProjectSekaiUserData.getUserPJSKData(user.id.value)
+            val top100 = cometClient.getCurrentEventTop100()
+
+            when {
+                top100.any { it.userId == userData?.userID } && position == 0 -> {
+                    if (SkikoHelper.isSkikoLoaded()) {
+                        subject.sendMessage(ProjectSekaiImageService.drawEventInfo(userData, 0, top100))
+                    } else {
+                        subject.sendMessage(top100.toMessageWrapper(userData, 0))
+                    }
+                }
+
+                position in 1..100 -> {
+                    if (SkikoHelper.isSkikoLoaded()) {
+                        subject.sendMessage(ProjectSekaiImageService.drawEventInfo(null, position, top100))
+                    } else {
+                        subject.sendMessage(top100.toMessageWrapper(null, position))
+                    }
+                }
+
+                else -> {
+                    subject.sendMessage("由于游戏限制, 目前仅能查询 TOP 100 的玩家".toMessageWrapper())
+                }
+            }
         }
     }
 
