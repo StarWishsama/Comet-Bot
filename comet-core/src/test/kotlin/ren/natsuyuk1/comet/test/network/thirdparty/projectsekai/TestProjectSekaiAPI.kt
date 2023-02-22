@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import ren.natsuyuk1.comet.api.database.DatabaseManager
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCurrentEventTop100
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getUserInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.toMessageWrapper
@@ -70,6 +71,15 @@ class TestProjectSekaiAPI {
 
         runBlocking {
             client.getUserInfo(id).toMessageWrapper().print()
+        }
+    }
+
+    @Test
+    fun testTop100() {
+        if (isCI()) return
+
+        runBlocking {
+            client.getCurrentEventTop100().print()
         }
     }
 

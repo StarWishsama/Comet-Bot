@@ -16,7 +16,7 @@ data class ProjectSekaiEventInfo(
         val userCheerfulCarnival: UserCheerfulCarnival, // may change in 3.5.0, need to be updated
         val userId: Long,
         val userProfile: ProjectSekaiUserInfo.UserProfile,
-        val userProfileHonors: List<ProjectSekaiUserInfo.UserHonor>,
+        val userProfileHonors: List<ProjectSekaiUserInfo.UserHonor>? = null,
     )
 
     @Serializable
