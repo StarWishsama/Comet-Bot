@@ -27,6 +27,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+          cache: gradle
 
       - uses: gradle/gradle-build-action@v2
         name: 设置 Gradle

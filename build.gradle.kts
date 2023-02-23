@@ -65,8 +65,8 @@ task("buildComet") {
     dependsOn(project("comet-telegram-wrapper").tasks.findByName("shadowJar"))
 }
 
-// agree build scan tos
-if (hasProperty("buildScan")) {
+// agree build scan tos ON ci
+if (hasProperty("buildScan") && System.getenv().containsKey("CI")) {
     extensions.findByName("buildScan")?.withGroovyBuilder {
         setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
         setProperty("termsOfServiceAgree", "yes")
