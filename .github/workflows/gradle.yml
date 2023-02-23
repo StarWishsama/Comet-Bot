@@ -39,7 +39,7 @@ jobs:
         run: "./gradlew ktlintCheck test buildComet --full-stacktrace --scan"
 
       - name: "为提交更改添加构建扫描结果链接"
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         if: github.event_name == 'pull_request' && failure()
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
