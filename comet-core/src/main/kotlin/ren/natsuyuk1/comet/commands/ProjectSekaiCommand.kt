@@ -151,13 +151,12 @@ class ProjectSekaiCommand(
                         当前活动 ${data?.name}
                             
                         距离活动结束还有 ${data?.aggregateTime
-                            ?.toInstant()
+                            ?.toInstant(true)
                             ?.let { Clock.System.now().minus(it) }
                             ?.toFriendly()
                         }    
                         """.trimIndent().toMessageWrapper(),
                     )
-                    subject.sendMessage("由于游戏限制, 目前仅能查询 TOP 100 的玩家".toMessageWrapper())
                 }
             }
         }
