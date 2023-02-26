@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.commands
 
+import kotlinx.datetime.Clock
 import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
@@ -18,13 +19,16 @@ import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCu
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
+import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.util.toMessageWrapper
+import ren.natsuyuk1.comet.utils.datetime.toFriendly
 import ren.natsuyuk1.comet.utils.file.isBlank
 import ren.natsuyuk1.comet.utils.file.isType
+import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 import ren.natsuyuk1.comet.utils.skiko.SkikoHelper
 import java.io.File
 
@@ -141,6 +145,18 @@ class ProjectSekaiCommand(
                 }
 
                 else -> {
+                    val data = ProjectSekaiData.getCurrentEventInfo()
+                    subject.sendMessage(
+                        """
+                        当前活动 ${data?.name}
+                            
+                        距离活动结束还有 ${data?.aggregateTime
+                            ?.toInstant()
+                            ?.let { Clock.System.now().minus(it) }
+                            ?.toFriendly()
+                        }    
+                        """.trimIndent().toMessageWrapper(),
+                    )
                     subject.sendMessage("由于游戏限制, 目前仅能查询 TOP 100 的玩家".toMessageWrapper())
                 }
             }
