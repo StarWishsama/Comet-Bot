@@ -33,7 +33,6 @@ jobs:
         name: 设置 Gradle
         with:
           gradle-version: wrapper
-          gradle-home-cache-cleanup: true
 
       - name: 检查格式、测试并打包
         id: gradle

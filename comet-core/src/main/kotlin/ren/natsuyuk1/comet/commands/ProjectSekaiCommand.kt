@@ -134,9 +134,9 @@ class ProjectSekaiCommand(
 
                 position in 1..100 -> {
                     if (SkikoHelper.isSkikoLoaded()) {
-                        subject.sendMessage(ProjectSekaiImageService.drawEventInfo(null, position, top100))
+                        subject.sendMessage(ProjectSekaiImageService.drawEventInfo(null, position - 1, top100))
                     } else {
-                        subject.sendMessage(top100.toMessageWrapper(null, position))
+                        subject.sendMessage(top100.toMessageWrapper(null, position - 1))
                     }
                 }
 
