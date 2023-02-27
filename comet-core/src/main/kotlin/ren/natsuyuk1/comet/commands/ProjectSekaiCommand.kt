@@ -17,11 +17,13 @@ import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCurrentEventTop100
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiUserData
 import ren.natsuyuk1.comet.objects.pjsk.local.ProjectSekaiMusic
+import ren.natsuyuk1.comet.service.ProjectSekaiManager
 import ren.natsuyuk1.comet.service.image.ProjectSekaiImageService
 import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.util.toMessageWrapper
@@ -146,16 +148,35 @@ class ProjectSekaiCommand(
 
                 else -> {
                     val data = ProjectSekaiData.getCurrentEventInfo()
+
                     subject.sendMessage(
-                        """
-                        当前活动 ${data?.name}
+                        buildMessageWrapper {
+                            when (ProjectSekaiManager.getCurrentEventStatus()) {
+                                SekaiEventStatus.ONGOING -> {
+                                    appendText(
+                                        """
+                                    当前活动 ${data?.name}
                             
-                        距离活动结束还有 ${data?.aggregateTime
-                            ?.toInstant(true)
-                            ?.let { Clock.System.now().minus(it) }
-                            ?.toFriendly()
-                        }    
-                        """.trimIndent().toMessageWrapper(),
+                                    距离活动结束还有 ${
+                                        data?.aggregateTime
+                                            ?.toInstant(true)
+                                            ?.let { it - Clock.System.now() }
+                                            ?.toFriendly()
+                                        }    
+                                        """.trimIndent(),
+                                    )
+                                }
+                                SekaiEventStatus.END -> {
+                                    appendText("当前活动 ${data?.name} 已结束")
+                                }
+
+                                SekaiEventStatus.COUNTING -> {
+                                    appendText("当前活动 ${data?.name} 正在计分中...")
+                                }
+
+                                else -> {}
+                            }
+                        },
                     )
                 }
             }
