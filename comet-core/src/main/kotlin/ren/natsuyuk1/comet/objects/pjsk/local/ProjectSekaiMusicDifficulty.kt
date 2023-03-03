@@ -42,7 +42,7 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
     override suspend fun update(): Boolean {
         file.touch()
 
-        GitHubApi.getSpecificFileCommits("StarWishsama", "comet-resource-database", "projectsekai/music_title.json")
+        GitHubApi.getSpecificFileCommits("Sekai-World", "sekai-master-db-diff", "musicDifficulties.json")
             .onSuccess {
                 val commitTime = Instant.parse(it.first().commit.committer.date)
                 val lastModified = file.lastModifiedTime()
@@ -55,7 +55,7 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
                             file,
                         ) == DownloadStatus.OK
                     ) {
-                        logger.info { "成功更新歌曲别名数据" }
+                        logger.info { "成功更新歌曲难度数据" }
                         return true
                     }
                 }
