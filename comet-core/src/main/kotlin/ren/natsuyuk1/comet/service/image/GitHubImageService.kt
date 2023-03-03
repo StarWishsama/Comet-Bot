@@ -27,6 +27,7 @@ import ren.natsuyuk1.comet.utils.string.StringUtil.limit
 import java.awt.Color
 import java.io.File
 import java.nio.file.Files
+import kotlin.math.max
 import kotlin.time.Duration.Companion.hours
 
 object GitHubImageService {
@@ -60,8 +61,12 @@ object GitHubImageService {
         drawImage(logo, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN)
 
         header.paint(this, GITHUB_CONTENT_PADDING * 2.5f + logo.width, GITHUB_CONTENT_MARGIN)
-        body.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + logo.height)
-        padding.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 3 + logo.height + body.height)
+        body.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + max(logo.height.toFloat(), header.height))
+        padding.paint(
+            this,
+            GITHUB_CONTENT_PADDING,
+            GITHUB_CONTENT_MARGIN * 3 + max(logo.height.toFloat(), header.height) + body.height,
+        )
     }
 
     private suspend fun Surface.generateTempImageFile(event: GitHubEventData): File {
