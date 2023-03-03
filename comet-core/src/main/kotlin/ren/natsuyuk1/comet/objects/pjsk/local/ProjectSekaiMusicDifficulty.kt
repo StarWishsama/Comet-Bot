@@ -67,5 +67,5 @@ object ProjectSekaiMusicDifficulty : ProjectSekaiLocalFile(
     }
 
     fun getDifficulty(musicId: Int, difficulty: MusicDifficulty) =
-        musicDifficulties.find { it.id == musicId && it.musicDifficulty == difficulty }
+        musicDifficulties.find { it.musicId == musicId && it.musicDifficulty == difficulty }
 }
