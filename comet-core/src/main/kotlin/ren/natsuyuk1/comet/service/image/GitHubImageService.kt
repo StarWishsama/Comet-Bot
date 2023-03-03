@@ -60,12 +60,14 @@ object GitHubImageService {
         // Draw github logo
         drawImage(logo, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN)
 
+        val headerHeight = max(logo.height.toFloat() + 5, header.height)
+
         header.paint(this, GITHUB_CONTENT_PADDING * 2.5f + logo.width, GITHUB_CONTENT_MARGIN)
-        body.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + max(logo.height.toFloat(), header.height))
+        body.paint(this, GITHUB_CONTENT_PADDING, GITHUB_CONTENT_MARGIN * 2 + headerHeight)
         padding.paint(
             this,
             GITHUB_CONTENT_PADDING,
-            GITHUB_CONTENT_MARGIN * 3 + max(logo.height.toFloat(), header.height) + body.height,
+            GITHUB_CONTENT_MARGIN * 3 + headerHeight + body.height,
         )
     }
 
@@ -163,7 +165,9 @@ object GitHubImageService {
 
         val padding = drawPadding(GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2)
 
-        val height = (pullRequestBody.height + padding.height * 3 + image.height).toInt()
+        val headerHeight = max(image.height.toFloat() + 5, repoInfo.height)
+
+        val height = (pullRequestBody.height + padding.height * 3 + headerHeight).toInt()
 
         val surface = Surface.makeRasterN32Premul(
             GITHUB_DEFAULT_WIDTH,
@@ -194,7 +198,9 @@ object GitHubImageService {
 
         val padding = drawPadding(GITHUB_DEFAULT_WIDTH - GITHUB_CONTENT_MARGIN * 2)
 
-        val height = (pushBody.height + padding.height * 3 + image.height).toInt()
+        val headerHeight = max(image.height.toFloat() + 5, repoInfo.height)
+
+        val height = (pushBody.height + padding.height * 3 + headerHeight).toInt()
 
         val surface = Surface.makeRasterN32Premul(
             GITHUB_DEFAULT_WIDTH,
