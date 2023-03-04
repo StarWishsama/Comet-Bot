@@ -1,6 +1,7 @@
 package ren.natsuyuk1.comet.objects.pjsk.local
 
 import io.ktor.http.*
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.builtins.ListSerializer
 import mu.KotlinLogging
@@ -15,6 +16,7 @@ import ren.natsuyuk1.comet.util.pjsk.pjskFolder
 import ren.natsuyuk1.comet.utils.file.*
 import ren.natsuyuk1.comet.utils.ktor.DownloadStatus
 import ren.natsuyuk1.comet.utils.ktor.downloadFile
+import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 import ren.natsuyuk1.comet.utils.string.ldSimilarity
 import ren.natsuyuk1.comet.utils.string.normalize
 import java.io.File
@@ -32,6 +34,9 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
 
     internal val musicDatabase = mutableMapOf<Int, ProjectSekaiMusicInfo>()
 
+    var activeMusicCount = 0
+        private set
+
     override suspend fun load() {
         musicDatabase.clear()
 
@@ -48,6 +53,10 @@ object ProjectSekaiMusic : ProjectSekaiLocalFile(
                 music.forEach {
                     musicDatabase[it.id] = it
                 }
+
+                val current = Clock.System.now()
+
+                activeMusicCount = music.count { it.publishedAt.toInstant(true) <= current }
             }
         } catch (e: Exception) {
             logger.warn(e) { "解析 歌曲数据时出现问题" }

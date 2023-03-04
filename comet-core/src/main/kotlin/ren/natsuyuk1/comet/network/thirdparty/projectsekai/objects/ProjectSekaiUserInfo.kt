@@ -129,7 +129,7 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper = buildMessageWrappe
     appendText(
         "EXPERT | Clear ${
         ex?.liveClear
-        }/${ProjectSekaiMusic.musicDatabase.size} / FC ${
+        }/${ProjectSekaiMusic.activeMusicCount} / FC ${
         ex?.fullCombo
         }",
     )
@@ -137,7 +137,7 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper = buildMessageWrappe
     appendText(
         "MASTER | Clear ${
         ma?.liveClear
-        }/${ProjectSekaiMusic.musicDatabase.size} / FC ${
+        }/${ProjectSekaiMusic.activeMusicCount} / FC ${
         ma?.fullCombo
         }",
     )
