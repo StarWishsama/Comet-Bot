@@ -4,6 +4,7 @@ hutool = "5.8.12"
 mirai = "2.14.0"
 exposed = "0.41.1"
 ktor = "2.2.4"
+ktlint = "0.48.2"
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -14,7 +15,6 @@ hutool-http = { module = "cn.hutool:hutool-http", version.ref = "hutool" }
 brotli4j = "com.aayushatharva.brotli4j:brotli4j:1.11.0"
 cron-utils = "com.cronutils:cron-utils:9.2.0"
 jsonpath = "com.jayway.jsonpath:json-path:2.7.0"
-ktlint = "com.pinterest:ktlint:0.48.2"
 rome = "com.rometools:rome:2.0.0"
 okio = "com.squareup.okio:okio:3.3.0"
 hikaricp = "com.zaxxer:HikariCP:5.0.1"
@@ -62,5 +62,4 @@ setsuna = "ren.natsuyuk1.setsuna:Setsuna:0.1.0-SNAPSHOT"
 
 [plugins]
 kotlin-plugin-serialization = "org.jetbrains.kotlin.plugin.serialization:1.8.10"
-ktlint = "org.jlleitschuh.gradle.ktlint:11.2.0"
-ktlint-idea = "org.jlleitschuh.gradle.ktlint-idea:11.2.0"
+spotless = "com.diffplug.spotless:6.16.0"

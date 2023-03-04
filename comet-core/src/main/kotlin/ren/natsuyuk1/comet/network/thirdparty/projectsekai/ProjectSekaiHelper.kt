@@ -61,8 +61,8 @@ internal fun ProjectSekaiEventInfo.toMessageWrapper(
         if (eventStatus == SekaiEventStatus.ONGOING) {
             appendTextln(
                 "离活动结束还有 ${
-                (eventInfo.aggregateTime.toInstant(true) - now)
-                    .toFriendly(TimeUnit.SECONDS)
+                    (eventInfo.aggregateTime.toInstant(true) - now)
+                        .toFriendly(TimeUnit.SECONDS)
                 }",
             )
         }

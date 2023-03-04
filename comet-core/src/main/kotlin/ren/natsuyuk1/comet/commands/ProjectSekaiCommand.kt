@@ -158,10 +158,10 @@ class ProjectSekaiCommand(
                                     当前活动 ${data?.name}
                             
                                     距离活动结束还有 ${
-                                        data?.aggregateTime
-                                            ?.toInstant(true)
-                                            ?.let { it - Clock.System.now() }
-                                            ?.toFriendly()
+                                            data?.aggregateTime
+                                                ?.toInstant(true)
+                                                ?.let { it - Clock.System.now() }
+                                                ?.toFriendly()
                                         }    
                                         """.trimIndent(),
                                     )

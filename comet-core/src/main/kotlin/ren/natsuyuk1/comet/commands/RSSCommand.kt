@@ -70,7 +70,7 @@ class RSSCommand(
 
             if (RSSPusher.subscriber.containsKey(url)) {
                 if (RSSPusher.subscriber[url]
-                    ?.find { it.id == subject.id && it.platform == subject.platform } != null
+                        ?.find { it.id == subject.id && it.platform == subject.platform } != null
                 ) {
                     subject.sendMessage("你已经订阅过这个 RSS 源了!".toMessageWrapper())
                 } else {
@@ -117,7 +117,7 @@ class RSSCommand(
 
             if (RSSPusher.subscriber.containsKey(url)) {
                 if (RSSPusher.subscriber[url]
-                    ?.find { it.id == subject.id && it.platform == subject.platform } == null
+                        ?.find { it.id == subject.id && it.platform == subject.platform } == null
                 ) {
                     subject.sendMessage("本群还未订阅过这个 RSS 源!".toMessageWrapper())
                 } else {

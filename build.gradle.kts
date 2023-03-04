@@ -7,13 +7,12 @@
  * https://github.com/StarWishsama/Comet-Bot/blob/dev/LICENSE
  */
 
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import com.diffplug.gradle.spotless.FormatExtension
 
 plugins {
     kotlin("jvm") apply false
     alias(libs.plugins.kotlin.plugin.serialization) apply false
-    alias(libs.plugins.ktlint)
-    alias(libs.plugins.ktlint.idea)
+    alias(libs.plugins.spotless)
 }
 
 repositories {
@@ -37,17 +36,42 @@ subprojects {
     }
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     apply(plugin = "comet-conventions")
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
-    configure<KtlintExtension> {
-        coloredOutput.set(false)
-        disabledRules.set(setOf("no-wildcard-imports", "import-ordering", "no-unused-imports", "filename"))
-        filter {
-            // exclude("**/generated/**")
-            fun exclude(path: String) = exclude {
-                projectDir.toURI().relativize(it.file.toURI()).normalize().path.contains(path)
-            }
-            setOf("/generated/", "/build/", "resources").forEach { exclude(it) }
-        }
+    apply(plugin = "com.diffplug.spotless")
+}
+
+spotless {
+    fun FormatExtension.excludes() {
+        targetExclude("**/build/", "**/generated/", "**/resources/")
+    }
+
+    fun FormatExtension.common() {
+        trimTrailingWhitespace()
+        lineEndings = com.diffplug.spotless.LineEnding.WINDOWS
+        endWithNewline()
+    }
+
+    val ktlintConfig = mapOf(
+        "ij_kotlin_allow_trailing_comma" to "true",
+        "ij_kotlin_allow_trailing_comma_on_call_site" to "true",
+        "trailing-comma-on-declaration-site" to "true",
+        "trailing-comma-on-call-site" to "true",
+        "ktlint_standard_no-wildcard-imports" to "disabled",
+        "ktlint_disabled_import-ordering" to "disabled",
+        "ktlint_standard_filename" to "disabled",
+    )
+
+    kotlin {
+        target("**/*.kt")
+        excludes()
+        common()
+        ktlint(libs.versions.ktlint.get()).editorConfigOverride(ktlintConfig)
+    }
+
+    kotlinGradle {
+        target("**/*.gradle.kts")
+        excludes()
+        common()
+        ktlint(libs.versions.ktlint.get()).editorConfigOverride(ktlintConfig)
     }
 }
 

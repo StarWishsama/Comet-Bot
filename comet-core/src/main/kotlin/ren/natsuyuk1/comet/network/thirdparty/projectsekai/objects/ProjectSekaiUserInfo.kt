@@ -128,17 +128,17 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper = buildMessageWrappe
 
     appendText(
         "EXPERT | Clear ${
-        ex?.liveClear
+            ex?.liveClear
         }/${ProjectSekaiMusic.activeMusicCount} / FC ${
-        ex?.fullCombo
+            ex?.fullCombo
         }",
     )
     appendLine()
     appendText(
         "MASTER | Clear ${
-        ma?.liveClear
+            ma?.liveClear
         }/${ProjectSekaiMusic.activeMusicCount} / FC ${
-        ma?.fullCombo
+            ma?.fullCombo
         }",
     )
 }

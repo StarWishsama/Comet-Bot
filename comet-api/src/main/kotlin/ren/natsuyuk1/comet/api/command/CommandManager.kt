@@ -222,9 +222,9 @@ object CommandManager {
             if (it.isPassed()) {
                 logger.info {
                     "命令 ${command.property.name} 执行状态 ${it.name}, 耗时 ${
-                    executeTime.getLastingTimeAsString(
-                        TimeUnit.MILLISECONDS,
-                    )
+                        executeTime.getLastingTimeAsString(
+                            TimeUnit.MILLISECONDS,
+                        )
                     }"
                 }
             }

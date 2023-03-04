@@ -41,7 +41,7 @@ object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
 
 @Serializable
 enum class OldUserLevel {
-    USER, ADMIN, OWNER, CONSOLE;
+    USER, ADMIN, OWNER, CONSOLE
 }
 
 fun OldUserLevel.toUserLevel(): UserLevel =

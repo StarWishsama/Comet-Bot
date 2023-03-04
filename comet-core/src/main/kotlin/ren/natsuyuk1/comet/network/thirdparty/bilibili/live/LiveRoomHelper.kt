@@ -23,7 +23,7 @@ fun LiveRoomData.isLiveTimeInvalid(): Boolean {
 }
 
 enum class LiveStatus(var status: String) {
-    NoStreaming("闲置"), Streaming("直播"), PlayingVideo("轮播"), Unknown("未知");
+    NoStreaming("闲置"), Streaming("直播"), PlayingVideo("轮播"), Unknown("未知")
 }
 
 fun LiveRoomData.toSimpleLiveRoomData(): SimpleLiveRoomData =

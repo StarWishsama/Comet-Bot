@@ -7,13 +7,8 @@ charset = utf-8
 indent_style = space
 
 [{*.kt,*.kts}]
-ktlint_disabled_rules = no-wildcard-imports, import-ordering, no-unused-imports, filename
-
 indent_size = 4
 max_line_length = 120
-
-ij_kotlin_allow_trailing_comma = true
-ij_kotlin_allow_trailing_comma_on_call_site = true
 
 [*.{bash,sh,zsh,fish}]
 indent_size = 2

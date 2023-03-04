@@ -1,42 +1,33 @@
 #!/bin/sh
 ######## KTLINT-GRADLE HOOK START ########
 
-if [ ! -e "./gradlew" ]; then
-  exit 0
-fi
+echo "Starting pre-commit check."
 
-CHANGED_FILES="$(git --no-pager diff --name-status --no-color --cached | awk '$1 != "D" && $NF ~ /\.kts?$/ { print $NF }')"
+  if [ ! -e "./gradlew" ]; then
+    return 0
+  fi
 
-if [ -z "$CHANGED_FILES" ]; then
+  CHANGED_FILES="$(git --no-pager diff --name-status --no-color --cached | awk '$1 != "D" && $NF ~ /\.kts?$/ { print $NF }')"
+
+  if [ -z "$CHANGED_FILES" ]; then
     echo "No Kotlin staged files."
-    exit 0
-fi;
+    return 0
+  fi
 
-echo "Running ktlint over these files:"
-echo "$CHANGED_FILES"
+  echo '[pre-commit] Executing Gradle spotlessCheck before commit'
 
-diff=.git/unstaged-ktlint-git-hook.diff
-git diff --color=never > $diff
-if [ -s $diff ]; then
-  git apply -R $diff
-fi
+  git stash --quiet --keep-index
 
-./gradlew --quiet ktlintFormat -PinternalKtlintGitFilter="$CHANGED_FILES"
-gradle_command_exit_code=$?
+  ./gradlew spotlessCheck --daemon
 
-echo "$CHANGED_FILES" | while read -r file; do
-    if [ -f $file ]; then
-        git add $file
-    fi
-done
+  RESULT=$?
 
+  git stash pop -q
 
-if [ -s $diff ]; then
-  git apply --ignore-whitespace $diff
-fi
-rm $diff
-unset diff
+  if [ "$RESULT" -ne "0" ]; then
+    echo -e "spotlessCheck failed..."
+    echo -e 'You can try "./gradlew spotlessApply" to apply auto-fixes.'
+  fi
 
-echo
-exit $gradle_command_exit_code
+exit $RESULT
 ######## KTLINT-GRADLE HOOK END ########

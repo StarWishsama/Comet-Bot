@@ -74,7 +74,7 @@ class MiraiComet(
                     } catch (e: Exception) {
                         throw NoStandardInputForCaptchaException(e)
                     }
-                },)
+                })
             } else {
                 null
             }

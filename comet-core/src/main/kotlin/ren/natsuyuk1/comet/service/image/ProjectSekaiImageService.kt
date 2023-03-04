@@ -124,7 +124,7 @@ object ProjectSekaiImageService {
                 SekaiEventStatus.ONGOING -> {
                     addTextln(
                         "离活动结束还有 ${
-                        (eventInfo.aggregateTime.toInstant(true) - now).toFriendly(TimeUnit.SECONDS)
+                            (eventInfo.aggregateTime.toInstant(true) - now).toFriendly(TimeUnit.SECONDS)
                         }",
                     )
                 }

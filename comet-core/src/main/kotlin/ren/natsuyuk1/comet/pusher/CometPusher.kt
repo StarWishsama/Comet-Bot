@@ -60,7 +60,7 @@ abstract class CometPusher(val name: String, private val defaultConfig: CometPus
             } else {
                 delay(config.pushInterval.toDuration(config.pushIntervalUnit))
             }
-        },) {
+        }) {
             retrieve()
             push()
         }
