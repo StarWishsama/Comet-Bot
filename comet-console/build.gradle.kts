@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jline:jline:3.22.0")
+    implementation("org.jline:jline:3.23.0")
 
     implementation(project(":comet-api"))
     implementation(project(":comet-core"))
