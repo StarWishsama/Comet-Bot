@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.8.10"
-hutool = "5.8.12"
+hutool = "5.8.15"
 mirai = "2.14.0"
 exposed = "0.41.1"
 ktor = "2.2.4"
