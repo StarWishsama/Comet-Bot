@@ -9,32 +9,52 @@
 
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33
 
-import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
-import ren.natsuyuk1.comet.utils.datetime.format
 import ren.natsuyuk1.comet.utils.math.NumberUtil.getBetterNumber
+import ren.natsuyuk1.comet.utils.math.NumberUtil.toInstant
 import ren.natsuyuk1.comet.utils.string.StringUtil.isNumeric
-import ren.natsuyuk1.comet.utils.time.yyMMddWithTimePattern
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class PJSKEventPredictionInfo(
     val status: String,
     val data: JsonObject,
+    val rank: JsonObject,
     val message: String,
-)
+    val event: PredictEventInfo,
+) {
+    @Serializable
+    data class PredictEventInfo(
+        val id: Int,
+        val name: String,
+        val startAt: Long,
+        val aggregateAt: Long,
+    )
+}
 
-fun PJSKEventPredictionInfo.toMessageWrapper(updateTime: Instant? = null): MessageWrapper =
+fun PJSKEventPredictionInfo.toMessageWrapper(isFinal: Boolean = false): MessageWrapper =
     buildMessageWrapper {
-        val eventName = data["eventName"]?.jsonPrimitive?.content
+        val timestamp = data["data"]?.jsonObject?.get("ts")?.jsonPrimitive?.longOrNull
 
-        appendText("活动 $eventName PT预测\n")
+        appendText("活动 ${event.name} PT预测\n")
 
-        data.forEach { k, v ->
-            if (k.isNumeric()) appendTextln("$k => ${v.jsonPrimitive.content.toLong().getBetterNumber()}")
+        if (isFinal) {
+            rank.forEach { k, v ->
+                if (k.isNumeric()) appendTextln("$k => ${v.jsonPrimitive.content.toLong().getBetterNumber()}")
+            }
+        } else {
+            data.forEach { k, v ->
+                if (k.isNumeric()) appendTextln("$k => ${v.jsonPrimitive.content.toLong().getBetterNumber()}")
+            }
         }
 
-        appendText("上次更新于 ${updateTime?.format(yyMMddWithTimePattern)}")
+        appendTextln("由于服务器限制，预测误差极大，请谨慎参考!")
+        appendLine()
+        appendTextln("数据来源于 33Kit")
+        appendText("上次更新于 ${timestamp?.toInstant(true)}")
     }

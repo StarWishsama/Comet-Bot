@@ -16,8 +16,10 @@ import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCurrentEventTop100
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventPreditionData
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.SekaiEventStatus
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.toMessageWrapper
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.toMessageWrapper
 import ren.natsuyuk1.comet.objects.config.FeatureConfig
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
@@ -44,7 +46,8 @@ val PROJECTSEKAI by lazy {
             "/pjsk pred 查询当前活动结束预测分数\n" +
             "/pjsk info 查询账号信息\n" +
             "/pjsk chart 查询歌曲谱面\n" +
-            "/pjsk music 查询歌曲信息",
+            "/pjsk music 查询歌曲信息\n" +
+            "/pjsk status 查询活动状态",
     )
 }
 
@@ -147,37 +150,7 @@ class ProjectSekaiCommand(
                 }
 
                 else -> {
-                    val data = ProjectSekaiData.getCurrentEventInfo()
-
-                    subject.sendMessage(
-                        buildMessageWrapper {
-                            when (ProjectSekaiManager.getCurrentEventStatus()) {
-                                SekaiEventStatus.ONGOING -> {
-                                    appendText(
-                                        """
-                                    当前活动 ${data?.name}
-                            
-                                    距离活动结束还有 ${
-                                            data?.aggregateTime
-                                                ?.toInstant(true)
-                                                ?.let { it - Clock.System.now() }
-                                                ?.toFriendly()
-                                        }    
-                                        """.trimIndent(),
-                                    )
-                                }
-                                SekaiEventStatus.END -> {
-                                    appendText("当前活动 ${data?.name} 已结束")
-                                }
-
-                                SekaiEventStatus.COUNTING -> {
-                                    appendText("当前活动 ${data?.name} 正在计分中...")
-                                }
-
-                                else -> {}
-                            }
-                        },
-                    )
+                    subject.sendMessage(cometClient.getEventPreditionData().toMessageWrapper())
                 }
             }
         }
@@ -204,7 +177,11 @@ class ProjectSekaiCommand(
                 val userData = ProjectSekaiUserData.getUserPJSKData(user.id.value)
 
                 if (userData == null) {
-                    subject.sendMessage("你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定".toMessageWrapper())
+                    subject.sendMessage(
+                        "你还没有绑定过世界计划账号, 使用 /pjsk bind -i [你的ID] 绑定"
+                            .toMessageWrapper()
+                            .trim(),
+                    )
                     return
                 }
 
@@ -303,6 +280,54 @@ class ProjectSekaiCommand(
             )
 
             subject.sendMessage(musicInfo?.toMessageWrapper() ?: "找不到你想要搜索的歌曲哦".toMessageWrapper())
+        }
+    }
+
+    class Status(
+        override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
+        override val user: CometUser,
+    ) : CometSubCommand(subject, sender, user, STATUS) {
+        companion object {
+            val STATUS = SubCommandProperty(
+                "status",
+                listOf("zt", "状态"),
+                PROJECTSEKAI,
+            )
+        }
+
+        override suspend fun run() {
+            val data = ProjectSekaiData.getCurrentEventInfo()
+
+            subject.sendMessage(
+                buildMessageWrapper {
+                    when (ProjectSekaiManager.getCurrentEventStatus()) {
+                        SekaiEventStatus.ONGOING -> {
+                            appendText(
+                                """
+                                    当前活动 ${data?.name}
+                            
+                                    距离活动结束还有 ${
+                                    data?.aggregateTime
+                                        ?.toInstant(true)
+                                        ?.let { it - Clock.System.now() }
+                                        ?.toFriendly()
+                                }    
+                                """.trimIndent(),
+                            )
+                        }
+                        SekaiEventStatus.END -> {
+                            appendText("当前活动 ${data?.name} 已结束")
+                        }
+
+                        SekaiEventStatus.COUNTING -> {
+                            appendText("当前活动 ${data?.name} 正在计分中...")
+                        }
+
+                        else -> {}
+                    }
+                },
+            )
         }
     }
 }

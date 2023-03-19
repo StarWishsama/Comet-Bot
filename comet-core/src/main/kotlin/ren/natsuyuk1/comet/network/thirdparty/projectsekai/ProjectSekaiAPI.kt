@@ -15,12 +15,14 @@ import io.ktor.http.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.decodeFromString
+import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.PJSKEventPredictionInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.json.serializeTo
 
@@ -46,6 +48,11 @@ object ProjectSekaiAPI {
      * 同样有很奇怪的请求参数, 请多加留意
      */
     private const val PJSEKAI_URL = "https://api.pjsek.ai/database/master"
+
+    /**
+     * 33Kit
+     */
+    private const val THREE_KIT_URL = "https://33.dsml.hk"
 
     private suspend fun CometClient.profileRequest(
         param: String,
@@ -118,6 +125,18 @@ object ProjectSekaiAPI {
         val resp = profileRequest("/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
             parameters.append("targetUserId", userId.toString())
         }
+
+        if (resp.status != HttpStatusCode.OK) {
+            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
+        }
+
+        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
+    }
+
+    suspend fun CometClient.getEventPreditionData(): PJSKEventPredictionInfo {
+        logger.debug { "Fetching current event point prediction result" }
+
+        val resp = cometClient.client.get("$THREE_KIT_URL/pred")
 
         if (resp.status != HttpStatusCode.OK) {
             error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
