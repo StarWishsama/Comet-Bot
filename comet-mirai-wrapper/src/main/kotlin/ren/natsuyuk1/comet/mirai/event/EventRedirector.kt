@@ -1,12 +1,9 @@
 package ren.natsuyuk1.comet.mirai.event
 
-import mu.KotlinLogging
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.events.*
 import ren.natsuyuk1.comet.api.event.EventManager
 import ren.natsuyuk1.comet.mirai.MiraiComet
-
-private val logger = KotlinLogging.logger {}
 
 suspend fun Event.redirectToComet(comet: MiraiComet) {
     when (this) {
