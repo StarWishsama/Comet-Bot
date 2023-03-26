@@ -67,6 +67,7 @@ class ProjectSekaiCommand(
                 Info(subject, sender, user),
                 Chart(subject, sender, user),
                 Music(subject, sender, user),
+                Status(subject, sender, user),
             )
         }
     }
