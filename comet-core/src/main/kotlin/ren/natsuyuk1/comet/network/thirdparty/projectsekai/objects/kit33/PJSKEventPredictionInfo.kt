@@ -39,7 +39,7 @@ data class PJSKEventPredictionInfo(
 
 fun PJSKEventPredictionInfo.toMessageWrapper(isFinal: Boolean = false): MessageWrapper =
     buildMessageWrapper {
-        val timestamp = data["data"]?.jsonObject?.get("ts")?.jsonPrimitive?.longOrNull
+        val timestamp = data.jsonObject["ts"]?.jsonPrimitive?.longOrNull
 
         appendText("活动 ${event.name} PT预测\n")
 
