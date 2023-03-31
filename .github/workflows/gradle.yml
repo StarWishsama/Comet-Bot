@@ -36,7 +36,7 @@ jobs:
 
       - name: 检查格式、测试并打包
         id: gradle
-        run: "./gradlew ktlintCheck test buildComet --full-stacktrace --scan"
+        run: "./gradlew spotlessCheck test buildComet --full-stacktrace --scan"
 
       - name: "为提交更改添加构建扫描结果链接"
         uses: actions/github-script@v6
