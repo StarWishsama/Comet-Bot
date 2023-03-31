@@ -1,5 +1,6 @@
 package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33
 
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import ren.natsuyuk1.comet.api.message.EmptyMessageWrapper
 import ren.natsuyuk1.comet.api.message.MessageWrapper
@@ -7,6 +8,7 @@ import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.math.NumberUtil.fixDisplay
 
+@Serializable
 data class PJSKCheerfulPreditionInfo(
     val timestamp: Long,
     val eventId: Int,
