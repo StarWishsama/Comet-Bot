@@ -41,13 +41,13 @@ fun PJSKEventPredictionInfo.toMessageWrapper(isFinal: Boolean = false): MessageW
     buildMessageWrapper {
         val timestamp = data.jsonObject["ts"]?.jsonPrimitive?.longOrNull
 
-        appendText("活动 ${event.name} PT预测\n")
-
         if (isFinal) {
+            appendTextln("活动 ${event.name} 最终PT预测")
             rank.forEach { k, v ->
                 if (k.isNumeric()) appendTextln("$k => ${v.jsonPrimitive.content.toLong().getBetterNumber()}")
             }
         } else {
+            appendTextln("活动 ${event.name} 当前PT预测")
             data.forEach { k, v ->
                 if (k.isNumeric()) appendTextln("$k => ${v.jsonPrimitive.content.toLong().getBetterNumber()}")
             }

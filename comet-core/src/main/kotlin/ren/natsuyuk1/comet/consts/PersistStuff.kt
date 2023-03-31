@@ -67,6 +67,8 @@ val defaultCommands: List<AbstractCommandNode<*>> =
                 ProjectSekaiCommand.Chart.CHART,
                 ProjectSekaiCommand.Music.MUSIC,
                 ProjectSekaiCommand.Status.STATUS,
+                ProjectSekaiCommand.Prediction.PREDICTION,
+                ProjectSekaiCommand.Cheerful.CHEERFUL,
             ),
         ) { comet, sender, subject, wrapper, user ->
             ProjectSekaiCommand(comet, sender, subject, wrapper, user)

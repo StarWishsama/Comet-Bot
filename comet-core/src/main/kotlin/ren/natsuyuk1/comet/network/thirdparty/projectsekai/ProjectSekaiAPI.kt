@@ -13,13 +13,13 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.decodeFromString
-import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
 import ren.natsuyuk1.comet.network.CometClient
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiEventList
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiRankSeasonInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.ProjectSekaiUserInfo
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.PJSKCheerfulPreditionInfo
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33.PJSKEventPredictionInfo
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
 import ren.natsuyuk1.comet.utils.json.serializeTo
@@ -108,7 +108,19 @@ object ProjectSekaiAPI {
     suspend fun CometClient.getEventPreditionData(): PJSKEventPredictionInfo {
         logger.debug { "Fetching current event point prediction result" }
 
-        val resp = cometClient.client.get("$THREE_KIT_URL/pred")
+        val resp = client.get("$THREE_KIT_URL/pred")
+
+        if (resp.status != HttpStatusCode.OK) {
+            error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
+        }
+
+        return json.decodeFromString(resp.bodyAsText().also { logger.debug { "Raw content: $it" } })
+    }
+
+    suspend fun CometClient.getCheerfulPrediction(): PJSKCheerfulPreditionInfo {
+        logger.debug { "Fetching current cheerful event prediction result" }
+
+        val resp = client.get("$THREE_KIT_URL/cheer-pred")
 
         if (resp.status != HttpStatusCode.OK) {
             error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")

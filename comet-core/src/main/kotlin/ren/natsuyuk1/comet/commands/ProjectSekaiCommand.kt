@@ -4,6 +4,7 @@ import kotlinx.datetime.Clock
 import moe.sdl.yac.core.subcommands
 import moe.sdl.yac.parameters.arguments.argument
 import moe.sdl.yac.parameters.arguments.default
+import moe.sdl.yac.parameters.options.flag
 import moe.sdl.yac.parameters.options.option
 import moe.sdl.yac.parameters.types.int
 import moe.sdl.yac.parameters.types.long
@@ -15,6 +16,7 @@ import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.api.user.CometUser
 import ren.natsuyuk1.comet.commands.service.ProjectSekaiService
 import ren.natsuyuk1.comet.consts.cometClient
+import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCheerfulPrediction
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getCurrentEventTop100
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.ProjectSekaiAPI.getEventPreditionData
 import ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.MusicDifficulty
@@ -47,7 +49,8 @@ val PROJECTSEKAI by lazy {
             "/pjsk info 查询账号信息\n" +
             "/pjsk chart 查询歌曲谱面\n" +
             "/pjsk music 查询歌曲信息\n" +
-            "/pjsk status 查询活动状态",
+            "/pjsk status 查询活动状态\n" +
+            "/pjsk cheerful 查询对战活动比分",
     )
 }
 
@@ -65,9 +68,11 @@ class ProjectSekaiCommand(
                 Bind(subject, sender, user),
                 Event(subject, sender, user),
                 Info(subject, sender, user),
+                Prediction(subject, sender, user),
                 Chart(subject, sender, user),
                 Music(subject, sender, user),
                 Status(subject, sender, user),
+                Cheerful(subject, sender, user),
             )
         }
     }
@@ -190,6 +195,26 @@ class ProjectSekaiCommand(
             } else {
                 subject.sendMessage(ProjectSekaiService.queryUserInfo(id))
             }
+        }
+    }
+
+    class Prediction(
+        override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
+        override val user: CometUser,
+    ) : CometSubCommand(subject, sender, user, PREDICTION) {
+        companion object {
+            val PREDICTION = SubCommandProperty(
+                "prediction",
+                listOf("pred", "预测"),
+                PROJECTSEKAI,
+            )
+        }
+
+        private val final by option("-f", "--final").flag(default = true)
+
+        override suspend fun run() {
+            sender.sendMessage(cometClient.getEventPreditionData().toMessageWrapper(final))
         }
     }
 
@@ -329,6 +354,24 @@ class ProjectSekaiCommand(
                     }
                 },
             )
+        }
+    }
+
+    class Cheerful(
+        override val subject: PlatformCommandSender,
+        override val sender: PlatformCommandSender,
+        override val user: CometUser,
+    ) : CometSubCommand(subject, sender, user, CHEERFUL) {
+        companion object {
+            val CHEERFUL = SubCommandProperty(
+                "cheerful",
+                listOf("cf", "对战"),
+                PROJECTSEKAI,
+            )
+        }
+
+        override suspend fun run() {
+            sender.sendMessage(cometClient.getCheerfulPrediction().toMessageWrapper())
         }
     }
 }
