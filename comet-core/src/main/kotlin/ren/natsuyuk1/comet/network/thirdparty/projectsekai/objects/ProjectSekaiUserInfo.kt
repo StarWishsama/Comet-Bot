@@ -130,7 +130,7 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper = buildMessageWrappe
                 ex.liveClear
             }/${ProjectSekaiMusic.activeMusicCount} / FC ${
                 ex.fullCombo
-            }/ AP ${ex.allPerfect}",
+            } / AP ${ex.allPerfect}",
         )
         appendLine()
     }
@@ -141,7 +141,7 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper = buildMessageWrappe
                 ma.liveClear
             }/${ProjectSekaiMusic.activeMusicCount} / FC ${
                 ma.fullCombo
-            }/ AP ${ma.allPerfect}",
+            } / AP ${ma.allPerfect}",
         )
     }
 }
