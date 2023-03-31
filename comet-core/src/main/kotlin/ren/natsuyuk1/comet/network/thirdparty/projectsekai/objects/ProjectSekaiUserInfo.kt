@@ -51,6 +51,7 @@ data class ProjectSekaiUserInfo(
 
     @Serializable
     data class MusicDifficultyClearInfo(
+        val allPerfect: Int,
         val fullCombo: Int,
         val liveClear: Int,
         val musicDifficultyType: MusicDifficulty,
@@ -123,22 +124,24 @@ fun ProjectSekaiUserInfo.toMessageWrapper(): MessageWrapper = buildMessageWrappe
     }
     appendTextln("歌曲游玩情况 >>")
 
-    val ex = userMusicDifficultyClearInfo.find { it.musicDifficultyType == MusicDifficulty.EXPERT }
-    val ma = userMusicDifficultyClearInfo.find { it.musicDifficultyType == MusicDifficulty.MASTER }
+    userMusicDifficultyClearInfo.find { it.musicDifficultyType == MusicDifficulty.EXPERT }?.let { ex ->
+        appendText(
+            "EXPERT | Clear ${
+                ex.liveClear
+            }/${ProjectSekaiMusic.activeMusicCount} / FC ${
+                ex.fullCombo
+            }/ AP ${ex.allPerfect}",
+        )
+        appendLine()
+    }
 
-    appendText(
-        "EXPERT | Clear ${
-            ex?.liveClear
-        }/${ProjectSekaiMusic.activeMusicCount} / FC ${
-            ex?.fullCombo
-        }",
-    )
-    appendLine()
-    appendText(
-        "MASTER | Clear ${
-            ma?.liveClear
-        }/${ProjectSekaiMusic.activeMusicCount} / FC ${
-            ma?.fullCombo
-        }",
-    )
+    userMusicDifficultyClearInfo.find { it.musicDifficultyType == MusicDifficulty.MASTER }?.let { ma ->
+        appendText(
+            "MASTER | Clear ${
+                ma.liveClear
+            }/${ProjectSekaiMusic.activeMusicCount} / FC ${
+                ma.fullCombo
+            }/ AP ${ma.allPerfect}",
+        )
+    }
 }

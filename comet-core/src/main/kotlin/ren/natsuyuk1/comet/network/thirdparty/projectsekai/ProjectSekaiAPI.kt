@@ -12,8 +12,6 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.decodeFromString
 import ren.natsuyuk1.comet.consts.cometClient
 import ren.natsuyuk1.comet.consts.json
@@ -30,15 +28,7 @@ private val logger = mu.KotlinLogging.logger {}
 
 object ProjectSekaiAPI {
     /**
-     * Project Sekai Profile Route
-     *
-     * 注意: %user_id% 就是原本的请求 URL, 不是参数
-     */
-    private const val PROFILE_URL = "https://api.pjsekai.moe"
-
-    /**
      * Unibot API
-     * 似乎是上方的自部署版本 (?)
      */
     private const val UNIBOT_API_URL = "https://api.unipjsk.com"
 
@@ -54,29 +44,11 @@ object ProjectSekaiAPI {
      */
     private const val THREE_KIT_URL = "https://33.dsml.hk"
 
-    private suspend fun CometClient.profileRequest(
+    private suspend fun CometClient.buildPJSKRequest(
         param: String,
         builder: URLBuilder.(URLBuilder) -> Unit = {},
-    ): HttpResponse {
-        return coroutineScope {
-            val unibotReq = async {
-                client.get("$UNIBOT_API_URL$param") {
-                    url(builder)
-                }.let {
-                    if (!it.status.isSuccess()) null else it
-                }
-            }
-
-            val profileReq = async {
-                client.get("$PROFILE_URL$param") {
-                    url(builder)
-                }.let {
-                    if (!it.status.isSuccess()) null else it
-                }
-            }
-
-            return@coroutineScope profileReq.await() ?: unibotReq.await() ?: error("Network error")
-        }
+    ): HttpResponse = client.get("$UNIBOT_API_URL$param") {
+        url(builder)
     }
 
     suspend fun CometClient.getEventList(limit: Int = 12, startAt: Int = -1, skip: Int = 0): ProjectSekaiEventList {
@@ -96,7 +68,7 @@ object ProjectSekaiAPI {
     suspend fun CometClient.getUserInfo(id: Long): ProjectSekaiUserInfo {
         logger.debug { "Fetching project sekai user info for $id" }
 
-        val resp = profileRequest("/api/user/$id/profile")
+        val resp = buildPJSKRequest("/api/user/$id/profile")
 
         if (resp.status != HttpStatusCode.OK) {
             error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
@@ -110,7 +82,7 @@ object ProjectSekaiAPI {
 
         val eventId = ProjectSekaiData.getEventId()
 
-        val resp = profileRequest("/api/user/{user_id}/event/$eventId/ranking?rankingViewType=top100")
+        val resp = buildPJSKRequest("/api/user/{user_id}/event/$eventId/ranking?rankingViewType=top100")
 
         if (resp.status != HttpStatusCode.OK) {
             error("API return code isn't OK (${resp.status}), raw request url: ${resp.call.request.url}")
@@ -122,7 +94,7 @@ object ProjectSekaiAPI {
     suspend fun CometClient.getRankSeasonInfo(userId: Long, rankSeasonId: Int): ProjectSekaiRankSeasonInfo {
         logger.debug { "Fetching project sekai rank season #$rankSeasonId info for $userId" }
 
-        val resp = profileRequest("/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
+        val resp = buildPJSKRequest("/api/user/%7Buser_id%7D/rank-match-season/$rankSeasonId/ranking") {
             parameters.append("targetUserId", userId.toString())
         }
 

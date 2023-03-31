@@ -10,7 +10,7 @@ fun String.toMessageWrapper(appendPrefix: String = CometGlobalConfig.data.prefix
     buildMessageWrapper {
         appendText(appendPrefix)
         appendText(this@toMessageWrapper)
-    }
+    }.trim()
 
 suspend inline fun CommandSender.sendMessage(message: String): MessageReceipt? =
     sendMessage(message.toMessageWrapper())

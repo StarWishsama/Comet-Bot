@@ -306,9 +306,9 @@ class ProjectSekaiCommand(
                         SekaiEventStatus.ONGOING -> {
                             appendText(
                                 """
-                                    当前活动 ${data?.name}
+                                当前活动 ${data?.name}
                             
-                                    距离活动结束还有 ${
+                                距离活动结束还有 ${
                                     data?.aggregateTime
                                         ?.toInstant(true)
                                         ?.let { it - Clock.System.now() }
@@ -322,7 +322,7 @@ class ProjectSekaiCommand(
                         }
 
                         SekaiEventStatus.COUNTING -> {
-                            appendText("当前活动 ${data?.name} 正在计分中...")
+                            appendText("当前活动 ${data?.name} 正在计分, 耐心等待哦")
                         }
 
                         else -> {}
