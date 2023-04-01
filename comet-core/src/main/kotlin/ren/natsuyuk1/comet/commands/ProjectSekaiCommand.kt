@@ -214,7 +214,7 @@ class ProjectSekaiCommand(
         private val final by option("-f", "--final").flag(default = true)
 
         override suspend fun run() {
-            sender.sendMessage(cometClient.getEventPreditionData().toMessageWrapper(final))
+            subject.sendMessage(cometClient.getEventPreditionData().toMessageWrapper(final))
         }
     }
 
@@ -371,7 +371,7 @@ class ProjectSekaiCommand(
         }
 
         override suspend fun run() {
-            sender.sendMessage(cometClient.getCheerfulPrediction().toMessageWrapper())
+            subject.sendMessage(cometClient.getCheerfulPrediction().toMessageWrapper())
         }
     }
 }

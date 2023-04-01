@@ -2,7 +2,6 @@ package ren.natsuyuk1.comet.network.thirdparty.projectsekai.objects.kit33
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import ren.natsuyuk1.comet.api.message.EmptyMessageWrapper
 import ren.natsuyuk1.comet.api.message.MessageWrapper
 import ren.natsuyuk1.comet.api.message.buildMessageWrapper
 import ren.natsuyuk1.comet.objects.pjsk.ProjectSekaiData
@@ -16,16 +15,16 @@ data class PJSKCheerfulPreditionInfo(
     val eventStartAt: Long,
     val eventAggregateAt: Long,
     val theme: String,
-    val teams: JsonObject,
+    val teams: JsonArray,
     val names: JsonObject,
     val members: JsonObject,
-    val announces: JsonObject,
+    val announces: JsonArray,
     val predictRates: JsonObject,
 ) {
     private val teamId: Pair<Int, Int>
         get() = Pair(
-            teams["0"]?.jsonPrimitive?.int ?: -1,
-            teams["1"]?.jsonPrimitive?.int ?: -1,
+            teams[0].jsonPrimitive.int,
+            teams[1].jsonPrimitive.int,
         )
 
     val teamName: Pair<String, String>?
@@ -33,8 +32,8 @@ data class PJSKCheerfulPreditionInfo(
             val (first, second) = teamId
 
             Pair(
-                teams[first.toString()]?.jsonPrimitive?.content ?: return null,
-                teams[second.toString()]?.jsonPrimitive?.content ?: return null,
+                names[first.toString()]?.jsonPrimitive?.content ?: return null,
+                names[second.toString()]?.jsonPrimitive?.content ?: return null,
             )
         }
 
@@ -46,18 +45,25 @@ data class PJSKCheerfulPreditionInfo(
         )
     }
 
-    fun getLatestPoint(): Pair<Int, Int>? {
+    fun getLatestAnnouncement(): Pair<Int, Int>? {
         val (first, second) = teamId
 
-        val latest = announces.values.map { it as? JsonObject }.last {
-            it?.get("points").let { ele ->
-                ele is JsonObject && ele.values.isNotEmpty()
-            }
-        }?.get("points")?.jsonObject
+        val latest = announces.last {
+            it.jsonObject["points"] is JsonObject
+        }.jsonObject["points"]?.jsonObject
 
         return Pair(
             latest?.get(first.toString())?.jsonPrimitive?.intOrNull ?: return null,
             latest[second.toString()]?.jsonPrimitive?.intOrNull ?: return null,
+        )
+    }
+
+    fun getMemberCount(): Pair<Int, Int>? {
+        val (first, second) = teamId
+
+        return Pair(
+            members[first.toString()]?.jsonPrimitive?.intOrNull ?: return null,
+            members[second.toString()]?.jsonPrimitive?.intOrNull ?: return null,
         )
     }
 }
@@ -72,15 +78,22 @@ fun PJSKCheerfulPreditionInfo.toMessageWrapper(): MessageWrapper {
     }
 
     return buildMessageWrapper {
-        val (team1, team2) = teamName ?: return EmptyMessageWrapper
-        val (t1p, t2p) = getLatestPoint() ?: return EmptyMessageWrapper
-        val (p1, p2) = getPredictRate() ?: return EmptyMessageWrapper
+        val (team1, team2) = teamName ?: error("Unable to fetch team name")
+        val la = getLatestAnnouncement()
+        val (p1, p2) = getPredictRate() ?: error("Unable to fetch predict rate")
+        val (t1c, t2c) = getMemberCount() ?: error("Unable to fetch member count")
 
         appendTextln("当前活动 $eventName 对战预测")
         appendLine()
-        appendTextln("$team1 当前分数 $t1p")
-        appendTextln("$team2 当前分数 $t2p")
-        appendLine()
+        if (la != null) {
+            val (t1p, t2p) = la
+            appendTextln("最新中间发表分数 >")
+            appendTextln("$team1 $t1p")
+            appendTextln("$team2 $t2p")
+            appendLine()
+        }
+        appendTextln("当前队伍人数 > ")
+        appendTextln("$team1 $t1c | $team2 $t2c")
         appendTextln("预计胜率 >")
         appendTextln("$team1 ${(p1 * 100).fixDisplay(1)}% | $team2 ${(p2 * 100).fixDisplay(1)}%")
         appendLine()
