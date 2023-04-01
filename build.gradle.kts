@@ -41,7 +41,7 @@ subprojects {
 
 spotless {
     fun FormatExtension.excludes() {
-        targetExclude("**/build/", "**/generated/", "**/resources/")
+        targetExclude("**/build/", "**/generated/", "**/resources/", "./buildSrc")
     }
 
     fun FormatExtension.common() {
