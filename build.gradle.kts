@@ -46,7 +46,7 @@ spotless {
 
     fun FormatExtension.common() {
         trimTrailingWhitespace()
-        lineEndings = com.diffplug.spotless.LineEnding.WINDOWS
+        lineEndings = com.diffplug.spotless.LineEnding.UNIX
         endWithNewline()
     }
 

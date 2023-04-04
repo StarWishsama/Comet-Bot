@@ -1,4 +1,4 @@
-name: Comet Builder
+name: Comet Checker
 
 on:
   workflow_dispatch:
@@ -16,8 +16,7 @@ on:
       - '.github/workflows/*.yml'
 
 jobs:
-
-  build:
+  spotlessCheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,13 +29,27 @@ jobs:
           cache: gradle
 
       - uses: gradle/gradle-build-action@v2
-        name: 设置 Gradle
+        name: 运行 Spotless 检查
         with:
           gradle-version: wrapper
+          argument: spotlessCheck
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-      - name: 检查格式、测试并打包
-        id: gradle
-        run: "./gradlew spotlessCheck test buildComet --full-stacktrace --scan"
+      - name: 设置 JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: gradle
+
+      - uses: gradle/gradle-build-action@v2
+        name: 运行测试
+        with:
+          gradle-version: wrapper
+          argument: "test --full-stacktrace --scan"
 
       - name: "为提交更改添加构建扫描结果链接"
         uses: actions/github-script@v6
@@ -49,7 +62,26 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: '❌ ${{ github.workflow }} 构建失败\nBuild Scan 报告: ${{ steps.gradle.outputs.build-scan-url }}'
-            })    
+            })
+  build:
+    need: [spotlessCheck, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 设置 JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: gradle
+
+      - uses: gradle/gradle-build-action@v2
+        name: 构建最新 Comet
+        id: build-comet
+        with:
+          argument: buildComet
+          gradle-version: wrapper
 
       - uses: actions/upload-artifact@v3
         if: github.event_name == 'push' && github.ref_name == 'dev'
