@@ -64,7 +64,7 @@ jobs:
               body: '❌ ${{ github.workflow }} 构建失败\nBuild Scan 报告: ${{ steps.gradle.outputs.build-scan-url }}'
             })
   build:
-    need: [spotlessCheck, test]
+    needs: [ spotlessCheck, test ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
