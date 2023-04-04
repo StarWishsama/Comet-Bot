@@ -32,7 +32,7 @@ jobs:
         name: 运行 Spotless 检查
         with:
           gradle-version: wrapper
-          argument: spotlessCheck
+          arguments: spotlessCheck
   test:
     runs-on: ubuntu-latest
     steps:
@@ -49,7 +49,7 @@ jobs:
         name: 运行测试
         with:
           gradle-version: wrapper
-          argument: "test --full-stacktrace --scan"
+          arguments: "test --full-stacktrace --scan"
 
       - name: "为提交更改添加构建扫描结果链接"
         uses: actions/github-script@v6
@@ -80,7 +80,7 @@ jobs:
         name: 构建最新 Comet
         id: build-comet
         with:
-          argument: buildComet
+          arguments: buildComet
           gradle-version: wrapper
 
       - uses: actions/upload-artifact@v3
