@@ -32,7 +32,7 @@ ktor-server-call-logging-jvm = { module = "io.ktor:ktor-server-call-logging-jvm"
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-rate-limit = { module = "io.ktor:ktor-server-rate-limit", version.ref = "ktor" }
-pebble = "io.pebbletemplates:pebble:3.2.0"
+pebble = "io.pebbletemplates:pebble:3.2.1"
 ipdb-core = "moe.sdl.ipdb:ipdb-core:0.2.1"
 yabapi-core-jvm = "moe.sdl.yabapi:yabapi-core-jvm:0.11.2"
 yac-core = "moe.sdl.yac:core:1.0.1"
