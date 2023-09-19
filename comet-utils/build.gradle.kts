@@ -80,6 +80,6 @@ dependencies {
     compileOnly(libs.ktor.serialization.kotlinx.json)
     compileOnly(libs.ktor.network)
 
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     api("net.mamoe.yamlkt:yamlkt:0.12.0")
 }

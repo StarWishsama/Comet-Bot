@@ -52,7 +52,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 atomicfu = "org.jetbrains.kotlinx:atomicfu:0.20.0"
 kotlinx-coroutines-core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
 kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
-kotlinx-serialization-json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+kotlinx-serialization-json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0"
 skiko = "org.jetbrains.skiko:skiko:0.7.76"
 jline = "org.jline:jline:3.22.0"
 jsoup = "org.jsoup:jsoup:1.16.1"
