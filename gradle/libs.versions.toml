@@ -8,7 +8,7 @@ ktlint = "0.48.2"
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-logback-classic = "ch.qos.logback:logback-classic:1.4.5"
+logback-classic = "ch.qos.logback:logback-classic:1.4.11"
 hutool-cron = { module = "cn.hutool:hutool-cron", version.ref = "hutool" }
 hutool-crypto = { module = "cn.hutool:hutool-crypto", version.ref = "hutool" }
 hutool-http = { module = "cn.hutool:hutool-http", version.ref = "hutool" }
